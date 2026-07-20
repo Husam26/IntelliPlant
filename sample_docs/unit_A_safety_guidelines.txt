@@ -1,0 +1,16 @@
+UNIT A: SAFETY AND COMPLIANCE GUIDELINES
+Document Revision: 2.1
+Applies to: All Unit A Assets (including P-101, P-102, HX-205)
+
+1. General Safety Rules
+- Hard hats, steel-toe boots, and safety glasses are mandatory in all areas of Unit A.
+- Noise levels near the centrifugal pumps often exceed 85 dB. Ear protection must be worn.
+
+2. LOTO (Lock-out/Tag-out) Procedure
+- Before performing maintenance on any rotating equipment (e.g. Pump P-101), the main electrical breaker must be locked out.
+- The isolation valve on the suction and discharge lines must be closed and tagged.
+- A permit-to-work must be signed by the Shift Supervisor (e.g. Alex Mercer) before any work commences.
+
+3. Compliance Requirements
+- API 653 Inspections are required for all storage tanks.
+- OSHA Safety Guard Checks must be completed monthly for all rotating machinery, including Pump P-101. Missing or bent coupling guards are a critical OSHA violation and must be reported.

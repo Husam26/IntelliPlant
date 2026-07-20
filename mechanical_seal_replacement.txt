@@ -1,0 +1,51 @@
+# SOP: Mechanical Seal Replacement for Pump P-101
+
+## 1. Overview
+This Standard Operating Procedure (SOP) outlines the steps required to safely and effectively replace the mechanical seal on Centrifugal Pump P-101. The mechanical seal prevents fluid leakage along the pump shaft. 
+Frequent seal failures on P-101 have been linked to improper installation and misalignment.
+
+## 2. Safety Precautions
+- **Lockout/Tagout (LOTO):** Ensure power to the pump motor is completely disconnected, locked, and tagged.
+- **De-pressurize:** Isolate the pump using suction and discharge valves. Drain the pump casing completely.
+- **PPE:** Wear safety goggles, chemical-resistant gloves, and steel-toed boots.
+
+## 3. Required Tools & Materials
+- New Mechanical Seal Kit (Part #MSK-204)
+- Allen wrench set
+- Torque wrench
+- Dial indicator (for shaft alignment)
+- Lint-free cloths and O-ring lubricant
+
+## 4. Procedure
+
+### Step 4.1: Disassembly
+1. Remove the coupling guard and disconnect the motor coupling.
+2. Unbolt and remove the pump casing cover.
+3. Carefully slide the impeller off the shaft (use an impeller puller if necessary).
+4. Remove the old mechanical seal assembly from the seal chamber.
+
+### Step 4.2: Inspection and Cleaning
+1. Inspect the pump shaft for scoring, wear, or bending. Max acceptable runout is 0.002 inches.
+2. Clean the seal chamber and shaft thoroughly using a lint-free cloth and approved solvent. Ensure no debris remains.
+
+### Step 4.3: Installation of New Seal
+1. Lightly lubricate the new O-rings with the supplied lubricant. Do NOT touch the carbon/ceramic seal faces with bare hands.
+2. Slide the stationary part of the seal into the gland plate.
+3. Carefully slide the rotary part of the seal onto the shaft until it seats against the shaft shoulder.
+4. Reinstall the gland plate and tighten the bolts evenly in a crisscross pattern to the specified torque (15 ft-lbs).
+
+### Step 4.4: Reassembly
+1. Reinstall the impeller and casing cover.
+2. Reconnect the motor coupling and perform a laser alignment to ensure the motor and pump shafts are perfectly aligned.
+3. Reinstall the coupling guard.
+
+## 5. Post-Maintenance Testing
+1. Open suction and discharge valves to flood the pump. Vent any trapped air.
+2. Check for static leaks around the seal area.
+3. Remove LOTO and restore power.
+4. Start the pump and monitor for unusual vibrations, noise, or dynamic leakage for at least 15 minutes.
+
+## 6. Document History
+- Version: 1.2
+- Last Updated: 2026-06-15
+- Author: Maintenance Department

@@ -1,0 +1,16 @@
+INCIDENT REPORT: JUNE 2026
+Date: June 15, 2026
+Reported By: Alex Mercer, Shift Supervisor
+
+Incident #1: Pump P-101 Failure
+- Time: 14:30
+- Description: Pump P-101 in Unit A suffered a catastrophic mechanical seal failure.
+- Root Cause: Vibration analysis revealed levels reached 7.2 mm/s, well above the 5.0 mm/s limit. The operators failed to notice the warning alarm on the dashboard.
+- Actions Taken: Emergency shutdown initiated. Maintenance team replaced the seal.
+- Follow-up: The maintenance crew noticed that the synthetic oil (ISO VG 32) was contaminated. The coupling guard was also found slightly bent, which may have contributed to the alignment issue.
+
+Incident #2: Compressor C-401 Overheating
+- Time: 09:15
+- Description: Gas Compressor C-401 in Unit B triggered a high-temperature alarm (Temp reached 95C).
+- Root Cause: Cooling water flow was restricted due to a blocked filter in Heat Exchanger HX-205.
+- Actions Taken: Switch to standby compressor. Cleaned HX-205 filter.

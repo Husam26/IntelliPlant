@@ -1,0 +1,22 @@
+STANDARD OPERATING PROCEDURE: PUMP MAINTENANCE
+Asset ID: Pump P-101
+Location: Unit A
+Criticality: High
+
+1. Introduction
+This SOP covers the regular maintenance and troubleshooting of Centrifugal Pump P-101. It must be read in conjunction with the Unit A Safety Guidelines.
+
+2. Mechanical Seal Replacement
+- The most common failure mode for Pump P-101 is mechanical seal leakage caused by high vibration.
+- Required Tools: Metric wrench set, torque wrench, seal alignment jig, and safety goggles.
+- Step 1: Isolate the pump and apply LOTO (Lock-out/Tag-out) procedures as per Unit A Safety Guidelines.
+- Step 2: Remove the coupling guard and disconnect the motor.
+- Step 3: Carefully extract the damaged mechanical seal. Ensure no debris falls into the casing.
+- Step 4: Install the new seal using the alignment jig. Torque bolts to 45 Nm.
+
+3. Routine Inspection
+- Check vibration levels weekly. If vibration exceeds 5.0 mm/s, an incident report must be filed immediately.
+- Inspect the bearing oil level. Use only synthetic oil grade ISO VG 32.
+
+4. Emergency Shutdown
+If smoke or sparks are detected, hit the emergency stop button on the local control panel and evacuate the immediate area.

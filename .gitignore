@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+venv/
+.pytest_cache/
+
+# Data files (generated at runtime)
+data/
+*.db
+
+# Environment secrets
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# FAISS index (generated at runtime)
+faiss_index/
+
+# Gemini Antigravity
+.gemini/
+.agents/
