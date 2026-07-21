@@ -114,11 +114,14 @@ export default function PlantMap() {
   }
 
   // --- Drag & Drop Logic ---
+  const dragRef = useRef(null);  // Use ref for immediate access (no React batching delay)
+  const didDragRef = useRef(false);
+
   const handleMouseDown = useCallback((e, asset) => {
     e.preventDefault();
-    e.stopPropagation();
     const rect = mapRef.current.getBoundingClientRect();
-    setDragState({
+    didDragRef.current = false;
+    dragRef.current = {
       assetId: asset.id,
       startX: e.clientX,
       startY: e.clientY,
@@ -126,44 +129,57 @@ export default function PlantMap() {
       origY: asset.y_pos,
       mapWidth: rect.width,
       mapHeight: rect.height,
-    });
-  }, []);
+    };
 
-  useEffect(() => {
-    if (!dragState) return;
+    const handleMouseMove = (ev) => {
+      const ds = dragRef.current;
+      if (!ds) return;
+      const distX = Math.abs(ev.clientX - ds.startX);
+      const distY = Math.abs(ev.clientY - ds.startY);
+      // Only start dragging after 5px movement threshold
+      if (distX < 5 && distY < 5) return;
+      didDragRef.current = true;
+      setDragState(ds); // Trigger visual drag state
 
-    const handleMouseMove = (e) => {
-      const dx = ((e.clientX - dragState.startX) / dragState.mapWidth) * 100;
-      const dy = ((e.clientY - dragState.startY) / dragState.mapHeight) * 100;
-      const newX = Math.max(5, Math.min(95, dragState.origX + dx));
-      const newY = Math.max(10, Math.min(90, dragState.origY + dy));
-
+      const dx = ((ev.clientX - ds.startX) / ds.mapWidth) * 100;
+      const dy = ((ev.clientY - ds.startY) / ds.mapHeight) * 100;
+      const newX = Math.max(5, Math.min(95, ds.origX + dx));
+      const newY = Math.max(10, Math.min(90, ds.origY + dy));
       setAssets(prev => prev.map(a =>
-        a.id === dragState.assetId ? { ...a, x_pos: newX, y_pos: newY } : a
+        a.id === ds.assetId ? { ...a, x_pos: newX, y_pos: newY } : a
       ));
     };
 
-    const handleMouseUp = async (e) => {
-      const dx = ((e.clientX - dragState.startX) / dragState.mapWidth) * 100;
-      const dy = ((e.clientY - dragState.startY) / dragState.mapHeight) * 100;
-      const newX = Math.max(5, Math.min(95, dragState.origX + dx));
-      const newY = Math.max(10, Math.min(90, dragState.origY + dy));
-
-      try {
-        await assetAPI.updatePosition(dragState.assetId, newX, newY);
-      } catch (err) {
-        console.error('Failed to save position:', err);
-      }
+    const handleMouseUp = async (ev) => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+      const ds = dragRef.current;
+      dragRef.current = null;
       setDragState(null);
+
+      if (!didDragRef.current) {
+        // No drag happened — treat as a click to open detail panel
+        selectAsset(asset);
+        return;
+      }
+
+      // Save new position
+      if (ds) {
+        const dx = ((ev.clientX - ds.startX) / ds.mapWidth) * 100;
+        const dy = ((ev.clientY - ds.startY) / ds.mapHeight) * 100;
+        const newX = Math.max(5, Math.min(95, ds.origX + dx));
+        const newY = Math.max(10, Math.min(90, ds.origY + dy));
+        try {
+          await assetAPI.updatePosition(ds.assetId, newX, newY);
+        } catch (err) {
+          console.error('Failed to save position:', err);
+        }
+      }
     };
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [dragState]);
+  }, [assets]);
 
   // Build connection lines from the connections field
   const connectionLines = [];
@@ -254,7 +270,6 @@ export default function PlantMap() {
                 borderColor: healthColor,
               }}
               onMouseDown={(e) => handleMouseDown(e, node)}
-              onClick={() => !dragState && selectAsset(node)}
             >
               <div className="node-pulse" style={{ borderColor: healthColor }} />
               <div className="node-icon" style={{ background: `${healthColor}22` }}>
