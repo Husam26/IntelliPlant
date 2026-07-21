@@ -357,6 +357,44 @@ export default function PlantMap() {
                 ))
               )}
             </div>
+
+            {/* Edit Connections */}
+            <div className="detail-section">
+              <h4><Activity size={14} /> Process Flow Connections</h4>
+              <div className="connections-picker">
+                {assets.filter(a => a.id !== selectedAsset.id).map(a => {
+                  const currentConns = (selectedAsset.connections || '').split(',').map(s => s.trim()).filter(Boolean);
+                  const isConnected = currentConns.includes(a.id);
+                  return (
+                    <label key={a.id} className={`connection-chip ${isConnected ? 'active' : ''}`}>
+                      <input type="checkbox" checked={isConnected}
+                        onChange={async (e) => {
+                          let newConns;
+                          if (e.target.checked) {
+                            newConns = [...currentConns, a.id];
+                          } else {
+                            newConns = currentConns.filter(c => c !== a.id);
+                          }
+                          const connStr = newConns.join(',');
+                          // Update locally
+                          setAssets(prev => prev.map(ast =>
+                            ast.id === selectedAsset.id ? { ...ast, connections: connStr } : ast
+                          ));
+                          setSelectedAsset(prev => ({ ...prev, connections: connStr }));
+                          // Save to backend
+                          try {
+                            await assetAPI.updateConnections(selectedAsset.id, connStr);
+                          } catch (err) {
+                            console.error('Failed to update connections:', err);
+                          }
+                        }} />
+                      <span className="chip-dot" style={{ background: getHealthColor(a.health_score) }} />
+                      {a.id}
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         )}
       </div>

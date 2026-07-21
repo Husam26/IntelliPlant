@@ -120,6 +120,18 @@ async def update_asset_position(asset_id: str, data: AssetPositionUpdate, db: Se
     return {"message": "Position updated", "asset_id": asset_id, "x_pos": data.x_pos, "y_pos": data.y_pos}
 
 
+@router.put("/{asset_id}/connections")
+async def update_asset_connections(asset_id: str, data: dict, db: Session = Depends(get_db)):
+    """Update which assets this asset is connected to on the Digital Twin."""
+    asset = db.query(Asset).filter(Asset.id == asset_id).first()
+    if not asset:
+        raise HTTPException(status_code=404, detail="Asset not found")
+    
+    asset.connections = data.get("connections", "")
+    db.commit()
+    return {"message": "Connections updated", "asset_id": asset_id, "connections": asset.connections}
+
+
 @router.delete("/{asset_id}")
 async def delete_asset(asset_id: str, db: Session = Depends(get_db)):
     """Delete an asset from the plant."""

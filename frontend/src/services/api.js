@@ -63,6 +63,9 @@ export const assetAPI = {
   /** Update asset position on plant map */
   updatePosition: (id, x_pos, y_pos) => api.put(`/assets/${id}/position`, { x_pos, y_pos }),
 
+  /** Update asset connections */
+  updateConnections: (id, connections) => api.put(`/assets/${id}/connections`, { connections }),
+
   /** Delete an asset */
   delete: (id) => api.delete(`/assets/${id}`),
 };
