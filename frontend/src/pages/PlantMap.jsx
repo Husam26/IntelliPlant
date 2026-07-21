@@ -1,36 +1,23 @@
 /**
  * PlantMap Page — Interactive Digital Twin of the Industrial Plant.
  * 
- * Displays a 2D visual map of the plant with:
- * - Clickable asset nodes with real-time health indicators
- * - Animated connection lines showing process flow
- * - Detail panel on click showing health, incidents, documents
- * - Color-coded health status (green/yellow/red)
+ * FULLY DYNAMIC: Users can add, drag, and remove assets via the UI.
+ * No hardcoded positions — everything comes from the database.
  */
 
-import { useState, useEffect } from 'react';
-import { Activity, AlertTriangle, FileText, X, Zap, Thermometer, Droplets, Wind } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { Activity, AlertTriangle, X, Zap, Thermometer, Droplets, Wind, Plus, Trash2, GripVertical } from 'lucide-react';
 import { assetAPI, analyticsAPI } from '../services/api';
 import '../styles/PlantMap.css';
 
-// Plant layout positions for each asset type
-const PLANT_LAYOUT = {
-  'P-101': { x: 15, y: 55, zone: 'Unit A', icon: 'pump', label: 'Pump P-101', connections: ['HX-205', 'V-302'] },
-  'P-102': { x: 15, y: 75, zone: 'Unit A', icon: 'pump', label: 'Pump P-102', connections: ['HX-205'] },
-  'HX-205': { x: 40, y: 45, zone: 'Unit A', icon: 'exchanger', label: 'Heat Exchanger HX-205', connections: ['C-401'] },
-  'V-302': { x: 40, y: 70, zone: 'Unit C', icon: 'valve', label: 'Valve V-302', connections: ['T-901'] },
-  'C-401': { x: 65, y: 40, zone: 'Unit B', icon: 'compressor', label: 'Compressor C-401', connections: ['T-901'] },
-  'M-505': { x: 65, y: 75, zone: 'Packaging', icon: 'motor', label: 'Motor M-505', connections: [] },
-  'T-901': { x: 85, y: 55, zone: 'Tank Farm', icon: 'tank', label: 'Tank T-901', connections: [] },
-};
-
-const ASSET_ICONS = {
-  pump: Droplets,
-  exchanger: Thermometer,
-  valve: Activity,
-  compressor: Wind,
-  motor: Zap,
-  tank: FileText,
+const ASSET_TYPE_ICONS = {
+  Pump: Droplets,
+  Exchanger: Thermometer,
+  Valve: Activity,
+  Compressor: Wind,
+  Motor: Zap,
+  Tank: Activity,
+  Equipment: Zap,
 };
 
 function getHealthColor(score) {
@@ -55,8 +42,15 @@ export default function PlantMap() {
   const [assets, setAssets] = useState([]);
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [incidents, setIncidents] = useState([]);
-  const [riskScores, setRiskScores] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [dragState, setDragState] = useState(null);
+  const mapRef = useRef(null);
+
+  // Form state for adding a new asset
+  const [newAsset, setNewAsset] = useState({
+    id: '', name: '', type: 'Pump', location: '', criticality: 'Medium', health_score: 85,
+  });
 
   useEffect(() => {
     loadPlantData();
@@ -64,12 +58,8 @@ export default function PlantMap() {
 
   async function loadPlantData() {
     try {
-      const [assetsRes, riskRes] = await Promise.all([
-        assetAPI.list(),
-        analyticsAPI.getRiskScores(),
-      ]);
-      setAssets(assetsRes.data.assets || []);
-      setRiskScores(riskRes.data.risk_scores || []);
+      const res = await assetAPI.list();
+      setAssets(res.data.assets || []);
     } catch (err) {
       console.error('Failed to load plant data:', err);
     } finally {
@@ -87,23 +77,100 @@ export default function PlantMap() {
     }
   }
 
-  // Merge backend asset data with layout positions
-  const plantNodes = assets.map(asset => ({
-    ...asset,
-    layout: PLANT_LAYOUT[asset.id] || { x: 50, y: 50, zone: 'Unknown', icon: 'pump', label: asset.name, connections: [] },
-  }));
+  async function handleAddAsset(e) {
+    e.preventDefault();
+    try {
+      // Auto-assign position in a grid pattern based on existing count
+      const count = assets.length;
+      const col = count % 4;
+      const row = Math.floor(count / 4);
+      const x_pos = 15 + col * 22;
+      const y_pos = 35 + row * 25;
 
-  // Generate connection lines between assets
-  const connections = [];
-  plantNodes.forEach(node => {
-    (node.layout.connections || []).forEach(targetId => {
-      const target = plantNodes.find(n => n.id === targetId);
+      await assetAPI.create({
+        ...newAsset,
+        x_pos, y_pos,
+        connections: '',
+      });
+      setShowAddModal(false);
+      setNewAsset({ id: '', name: '', type: 'Pump', location: '', criticality: 'Medium', health_score: 85 });
+      loadPlantData();
+    } catch (err) {
+      alert(err.response?.data?.detail || 'Failed to add asset');
+    }
+  }
+
+  async function handleDeleteAsset(assetId) {
+    if (!confirm(`Delete asset ${assetId}?`)) return;
+    try {
+      await assetAPI.delete(assetId);
+      setSelectedAsset(null);
+      loadPlantData();
+    } catch (err) {
+      alert('Failed to delete asset');
+    }
+  }
+
+  // --- Drag & Drop Logic ---
+  const handleMouseDown = useCallback((e, asset) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const rect = mapRef.current.getBoundingClientRect();
+    setDragState({
+      assetId: asset.id,
+      startX: e.clientX,
+      startY: e.clientY,
+      origX: asset.x_pos,
+      origY: asset.y_pos,
+      mapWidth: rect.width,
+      mapHeight: rect.height,
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!dragState) return;
+
+    const handleMouseMove = (e) => {
+      const dx = ((e.clientX - dragState.startX) / dragState.mapWidth) * 100;
+      const dy = ((e.clientY - dragState.startY) / dragState.mapHeight) * 100;
+      const newX = Math.max(5, Math.min(95, dragState.origX + dx));
+      const newY = Math.max(10, Math.min(90, dragState.origY + dy));
+
+      setAssets(prev => prev.map(a =>
+        a.id === dragState.assetId ? { ...a, x_pos: newX, y_pos: newY } : a
+      ));
+    };
+
+    const handleMouseUp = async (e) => {
+      const dx = ((e.clientX - dragState.startX) / dragState.mapWidth) * 100;
+      const dy = ((e.clientY - dragState.startY) / dragState.mapHeight) * 100;
+      const newX = Math.max(5, Math.min(95, dragState.origX + dx));
+      const newY = Math.max(10, Math.min(90, dragState.origY + dy));
+
+      try {
+        await assetAPI.updatePosition(dragState.assetId, newX, newY);
+      } catch (err) {
+        console.error('Failed to save position:', err);
+      }
+      setDragState(null);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [dragState]);
+
+  // Build connection lines from the connections field
+  const connectionLines = [];
+  assets.forEach(asset => {
+    const conns = (asset.connections || '').split(',').map(s => s.trim()).filter(Boolean);
+    conns.forEach(targetId => {
+      const target = assets.find(a => a.id === targetId);
       if (target) {
-        connections.push({
-          from: node,
-          to: target,
-          key: `${node.id}-${target.id}`,
-        });
+        connectionLines.push({ from: asset, to: target, key: `${asset.id}-${targetId}` });
       }
     });
   });
@@ -139,57 +206,53 @@ export default function PlantMap() {
           <span className="plant-stat-value critical">{assets.filter(a => a.health_score < 60).length}</span>
           <span className="plant-stat-label">Critical</span>
         </div>
+        <button className="add-asset-btn" onClick={() => setShowAddModal(true)}>
+          <Plus size={18} /> Add Asset
+        </button>
       </div>
 
-      <div className="plant-map-container">
-        {/* SVG Canvas for connections */}
+      <div className="plant-map-container" ref={mapRef}>
+        {/* SVG Connections */}
         <svg className="plant-connections-svg">
-          <defs>
-            <linearGradient id="flowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.2" />
-              <stop offset="50%" stopColor="#3b82f6" stopOpacity="0.8" />
-              <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.2" />
-            </linearGradient>
-          </defs>
-          {connections.map(conn => (
+          {connectionLines.map(conn => (
             <g key={conn.key}>
-              <line
-                className="connection-line"
-                x1={`${conn.from.layout.x}%`} y1={`${conn.from.layout.y}%`}
-                x2={`${conn.to.layout.x}%`} y2={`${conn.to.layout.y}%`}
+              <line className="connection-line"
+                x1={`${conn.from.x_pos}%`} y1={`${conn.from.y_pos}%`}
+                x2={`${conn.to.x_pos}%`} y2={`${conn.to.y_pos}%`}
               />
-              <line
-                className="connection-flow"
-                x1={`${conn.from.layout.x}%`} y1={`${conn.from.layout.y}%`}
-                x2={`${conn.to.layout.x}%`} y2={`${conn.to.layout.y}%`}
+              <line className="connection-flow"
+                x1={`${conn.from.x_pos}%`} y1={`${conn.from.y_pos}%`}
+                x2={`${conn.to.x_pos}%`} y2={`${conn.to.y_pos}%`}
               />
             </g>
           ))}
         </svg>
 
-        {/* Zone Labels */}
-        <div className="zone-label" style={{ left: '5%', top: '35%' }}>Unit A</div>
-        <div className="zone-label" style={{ left: '55%', top: '20%' }}>Unit B</div>
-        <div className="zone-label" style={{ left: '30%', top: '85%' }}>Unit C</div>
-        <div className="zone-label" style={{ left: '75%', top: '75%' }}>Packaging</div>
-        <div className="zone-label" style={{ left: '78%', top: '35%' }}>Tank Farm</div>
+        {/* Drag hint */}
+        {assets.length > 0 && !selectedAsset && (
+          <div className="drag-hint">
+            <GripVertical size={14} /> Drag assets to reposition them on the map
+          </div>
+        )}
 
         {/* Asset Nodes */}
-        {plantNodes.map(node => {
-          const IconComp = ASSET_ICONS[node.layout.icon] || Activity;
+        {assets.map(node => {
+          const IconComp = ASSET_TYPE_ICONS[node.type] || Zap;
           const healthColor = getHealthColor(node.health_score);
           const isSelected = selectedAsset?.id === node.id;
+          const isDragging = dragState?.assetId === node.id;
 
           return (
             <div
               key={node.id}
-              className={`plant-node ${getGlowClass(node.health_score)} ${isSelected ? 'selected' : ''}`}
+              className={`plant-node ${getGlowClass(node.health_score)} ${isSelected ? 'selected' : ''} ${isDragging ? 'dragging' : ''}`}
               style={{
-                left: `${node.layout.x}%`,
-                top: `${node.layout.y}%`,
+                left: `${node.x_pos}%`,
+                top: `${node.y_pos}%`,
                 borderColor: healthColor,
               }}
-              onClick={() => selectAsset(node)}
+              onMouseDown={(e) => handleMouseDown(e, node)}
+              onClick={() => !dragState && selectAsset(node)}
             >
               <div className="node-pulse" style={{ borderColor: healthColor }} />
               <div className="node-icon" style={{ background: `${healthColor}22` }}>
@@ -203,24 +266,37 @@ export default function PlantMap() {
           );
         })}
 
+        {/* Empty State */}
+        {assets.length === 0 && (
+          <div className="plant-empty-state">
+            <Zap size={48} />
+            <h3>No assets on the plant map</h3>
+            <p>Click "Add Asset" to start building your Digital Twin</p>
+          </div>
+        )}
+
         {/* Detail Panel */}
         {selectedAsset && (
           <div className="plant-detail-panel">
             <div className="detail-header">
               <div>
                 <h3>{selectedAsset.name}</h3>
-                <span className="detail-zone">{selectedAsset.layout.zone} • {selectedAsset.type}</span>
+                <span className="detail-zone">{selectedAsset.location} • {selectedAsset.type}</span>
               </div>
-              <button className="detail-close" onClick={() => setSelectedAsset(null)}>
-                <X size={18} />
-              </button>
+              <div style={{ display: 'flex', gap: 6 }}>
+                <button className="detail-close danger" onClick={() => handleDeleteAsset(selectedAsset.id)} title="Delete asset">
+                  <Trash2 size={16} />
+                </button>
+                <button className="detail-close" onClick={() => setSelectedAsset(null)}>
+                  <X size={18} />
+                </button>
+              </div>
             </div>
 
             <div className="detail-health-ring">
               <svg viewBox="0 0 120 120" className="health-ring-svg">
                 <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="8" />
-                <circle
-                  cx="60" cy="60" r="50" fill="none"
+                <circle cx="60" cy="60" r="50" fill="none"
                   stroke={getHealthColor(selectedAsset.health_score)}
                   strokeWidth="8"
                   strokeDasharray={`${(selectedAsset.health_score / 100) * 314} 314`}
@@ -248,7 +324,6 @@ export default function PlantMap() {
               </div>
             </div>
 
-            {/* Recent Incidents */}
             <div className="detail-section">
               <h4><AlertTriangle size={14} /> Recent Incidents</h4>
               {incidents.length === 0 ? (
@@ -265,28 +340,71 @@ export default function PlantMap() {
                 ))
               )}
             </div>
-
-            {/* Connected Assets */}
-            <div className="detail-section">
-              <h4><Activity size={14} /> Connected Assets</h4>
-              <div className="connected-assets">
-                {(selectedAsset.layout.connections || []).length === 0 ? (
-                  <div className="detail-empty">End of process line</div>
-                ) : (
-                  (selectedAsset.layout.connections || []).map(connId => (
-                    <span key={connId} className="connected-tag" onClick={() => {
-                      const a = plantNodes.find(n => n.id === connId);
-                      if (a) selectAsset(a);
-                    }}>
-                      {connId} →
-                    </span>
-                  ))
-                )}
-              </div>
-            </div>
           </div>
         )}
       </div>
+
+      {/* Add Asset Modal */}
+      {showAddModal && (
+        <div className="modal-overlay" onClick={() => setShowAddModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Add New Asset</h3>
+              <button className="detail-close" onClick={() => setShowAddModal(false)}><X size={18} /></button>
+            </div>
+            <form onSubmit={handleAddAsset} className="modal-form">
+              <div className="form-group">
+                <label>Asset ID</label>
+                <input type="text" placeholder="e.g. P-201" value={newAsset.id}
+                  onChange={e => setNewAsset({...newAsset, id: e.target.value.toUpperCase()})} required />
+              </div>
+              <div className="form-group">
+                <label>Asset Name</label>
+                <input type="text" placeholder="e.g. Centrifugal Pump 201" value={newAsset.name}
+                  onChange={e => setNewAsset({...newAsset, name: e.target.value})} required />
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Type</label>
+                  <select value={newAsset.type} onChange={e => setNewAsset({...newAsset, type: e.target.value})}>
+                    <option>Pump</option>
+                    <option>Compressor</option>
+                    <option>Exchanger</option>
+                    <option>Motor</option>
+                    <option>Valve</option>
+                    <option>Tank</option>
+                    <option>Equipment</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Criticality</label>
+                  <select value={newAsset.criticality} onChange={e => setNewAsset({...newAsset, criticality: e.target.value})}>
+                    <option>Critical</option>
+                    <option>High</option>
+                    <option>Medium</option>
+                    <option>Low</option>
+                  </select>
+                </div>
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Location / Zone</label>
+                  <input type="text" placeholder="e.g. Unit A" value={newAsset.location}
+                    onChange={e => setNewAsset({...newAsset, location: e.target.value})} />
+                </div>
+                <div className="form-group">
+                  <label>Health Score</label>
+                  <input type="number" min="0" max="100" value={newAsset.health_score}
+                    onChange={e => setNewAsset({...newAsset, health_score: parseInt(e.target.value) || 85})} />
+                </div>
+              </div>
+              <button type="submit" className="modal-submit-btn">
+                <Plus size={18} /> Add to Plant Map
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

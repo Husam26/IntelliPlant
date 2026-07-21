@@ -77,6 +77,11 @@ class Asset(Base):
     install_date = Column(Date)
     manufacturer = Column(String)
     
+    # Digital Twin positioning
+    x_pos = Column(Float, default=50.0)                    # X position on plant map (0-100%)
+    y_pos = Column(Float, default=50.0)                    # Y position on plant map (0-100%)
+    connections = Column(String, default="")               # Comma-separated connected asset IDs
+    
     # Relationships
     incidents = relationship("Incident", back_populates="asset")
     compliance_records = relationship("Compliance", back_populates="asset")

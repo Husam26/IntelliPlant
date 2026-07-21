@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.models import Asset, Incident
-from app.schemas.schemas import AssetResponse, AssetListResponse, IncidentResponse
+from app.schemas.schemas import AssetResponse, AssetListResponse, IncidentResponse, AssetCreateRequest, AssetPositionUpdate
 
 router = APIRouter()
 
@@ -77,3 +77,56 @@ async def get_asset_incidents(asset_id: str, db: Session = Depends(get_db)):
         "incidents": [IncidentResponse.model_validate(inc) for inc in incidents],
         "total": len(incidents),
     }
+
+
+@router.post("", response_model=AssetResponse)
+async def create_asset(data: AssetCreateRequest, db: Session = Depends(get_db)):
+    """Create a new asset from the Digital Twin UI."""
+    existing = db.query(Asset).filter(Asset.id == data.id).first()
+    if existing:
+        raise HTTPException(status_code=400, detail=f"Asset '{data.id}' already exists")
+    
+    asset = Asset(
+        id=data.id,
+        name=data.name,
+        type=data.type,
+        location=data.location,
+        criticality=data.criticality,
+        health_score=data.health_score,
+        x_pos=data.x_pos,
+        y_pos=data.y_pos,
+        connections=data.connections,
+        status="Active",
+    )
+    db.add(asset)
+    db.commit()
+    db.refresh(asset)
+    
+    asset_data = AssetResponse.model_validate(asset)
+    asset_data.incident_count = 0
+    return asset_data
+
+
+@router.put("/{asset_id}/position")
+async def update_asset_position(asset_id: str, data: AssetPositionUpdate, db: Session = Depends(get_db)):
+    """Update asset position on the Digital Twin map (called on drag-drop)."""
+    asset = db.query(Asset).filter(Asset.id == asset_id).first()
+    if not asset:
+        raise HTTPException(status_code=404, detail="Asset not found")
+    
+    asset.x_pos = data.x_pos
+    asset.y_pos = data.y_pos
+    db.commit()
+    return {"message": "Position updated", "asset_id": asset_id, "x_pos": data.x_pos, "y_pos": data.y_pos}
+
+
+@router.delete("/{asset_id}")
+async def delete_asset(asset_id: str, db: Session = Depends(get_db)):
+    """Delete an asset from the plant."""
+    asset = db.query(Asset).filter(Asset.id == asset_id).first()
+    if not asset:
+        raise HTTPException(status_code=404, detail="Asset not found")
+    db.delete(asset)
+    db.commit()
+    return {"message": f"Asset {asset_id} deleted"}
+

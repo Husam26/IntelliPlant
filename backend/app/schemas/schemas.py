@@ -68,9 +68,31 @@ class AssetResponse(BaseModel):
     install_date: Optional[date] = None
     manufacturer: Optional[str] = None
     incident_count: int = 0
+    x_pos: float = 50.0
+    y_pos: float = 50.0
+    connections: Optional[str] = ""
 
     class Config:
         from_attributes = True
+
+
+class AssetCreateRequest(BaseModel):
+    """Request body for creating a new asset from the UI."""
+    id: str = Field(..., min_length=1, max_length=20)
+    name: str = Field(..., min_length=1, max_length=100)
+    type: str = "Equipment"
+    location: str = "Unassigned"
+    criticality: str = "Medium"
+    health_score: float = 85.0
+    x_pos: float = 50.0
+    y_pos: float = 50.0
+    connections: str = ""
+
+
+class AssetPositionUpdate(BaseModel):
+    """Request body for updating asset position on the plant map."""
+    x_pos: float
+    y_pos: float
 
 
 class AssetListResponse(BaseModel):

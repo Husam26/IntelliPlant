@@ -56,6 +56,15 @@ export const assetAPI = {
 
   /** Get asset incident history */
   getIncidents: (id) => api.get(`/assets/${id}/incidents`),
+
+  /** Create a new asset */
+  create: (data) => api.post('/assets', data),
+
+  /** Update asset position on plant map */
+  updatePosition: (id, x_pos, y_pos) => api.put(`/assets/${id}/position`, { x_pos, y_pos }),
+
+  /** Delete an asset */
+  delete: (id) => api.delete(`/assets/${id}`),
 };
 
 // ========================

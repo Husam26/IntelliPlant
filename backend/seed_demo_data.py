@@ -19,13 +19,13 @@ def seed_database():
     
     print("Seeding Demo Assets...")
     assets = [
-        Asset(id="P-101", name="Centrifugal Pump 101", type="Pump", location="Unit A", criticality="Critical", health_score=78.5, status="Active"),
-        Asset(id="C-401", name="Gas Compressor 401", type="Compressor", location="Unit B", criticality="Critical", health_score=62.0, status="Warning"),
-        Asset(id="HX-205", name="Heat Exchanger 205", type="Exchanger", location="Unit A", criticality="Medium", health_score=92.0, status="Active"),
-        Asset(id="T-901", name="Storage Tank 901", type="Tank", location="Tank Farm", criticality="Low", health_score=98.0, status="Active"),
-        Asset(id="V-302", name="Control Valve 302", type="Valve", location="Unit C", criticality="High", health_score=85.0, status="Active"),
-        Asset(id="M-505", name="Conveyor Motor 505", type="Motor", location="Packaging", criticality="Medium", health_score=45.0, status="Critical"),
-        Asset(id="P-102", name="Centrifugal Pump 102", type="Pump", location="Unit A", criticality="High", health_score=88.0, status="Active"),
+        Asset(id="P-101", name="Centrifugal Pump 101", type="Pump", location="Unit A", criticality="Critical", health_score=78.5, status="Active", x_pos=15, y_pos=55, connections="HX-205,V-302"),
+        Asset(id="C-401", name="Gas Compressor 401", type="Compressor", location="Unit B", criticality="Critical", health_score=62.0, status="Warning", x_pos=65, y_pos=40, connections="T-901"),
+        Asset(id="HX-205", name="Heat Exchanger 205", type="Exchanger", location="Unit A", criticality="Medium", health_score=92.0, status="Active", x_pos=40, y_pos=45, connections="C-401"),
+        Asset(id="T-901", name="Storage Tank 901", type="Tank", location="Tank Farm", criticality="Low", health_score=98.0, status="Active", x_pos=85, y_pos=55, connections=""),
+        Asset(id="V-302", name="Control Valve 302", type="Valve", location="Unit C", criticality="High", health_score=85.0, status="Active", x_pos=40, y_pos=70, connections="T-901"),
+        Asset(id="M-505", name="Conveyor Motor 505", type="Motor", location="Packaging", criticality="Medium", health_score=45.0, status="Critical", x_pos=65, y_pos=75, connections=""),
+        Asset(id="P-102", name="Centrifugal Pump 102", type="Pump", location="Unit A", criticality="High", health_score=88.0, status="Active", x_pos=15, y_pos=75, connections="HX-205"),
     ]
     db.add_all(assets)
     
