@@ -51,6 +51,7 @@ export default function PlantMap() {
   const [newAsset, setNewAsset] = useState({
     id: '', name: '', type: 'Pump', location: '', criticality: 'Medium', health_score: 85,
   });
+  const [selectedConnections, setSelectedConnections] = useState([]);
 
   useEffect(() => {
     loadPlantData();
@@ -90,10 +91,11 @@ export default function PlantMap() {
       await assetAPI.create({
         ...newAsset,
         x_pos, y_pos,
-        connections: '',
+        connections: selectedConnections.join(','),
       });
       setShowAddModal(false);
       setNewAsset({ id: '', name: '', type: 'Pump', location: '', criticality: 'Medium', health_score: 85 });
+      setSelectedConnections([]);
       loadPlantData();
     } catch (err) {
       alert(err.response?.data?.detail || 'Failed to add asset');
@@ -398,6 +400,27 @@ export default function PlantMap() {
                     onChange={e => setNewAsset({...newAsset, health_score: parseInt(e.target.value) || 85})} />
                 </div>
               </div>
+              {assets.length > 0 && (
+                <div className="form-group">
+                  <label>Connect to (Process Flow Lines)</label>
+                  <div className="connections-picker">
+                    {assets.map(a => (
+                      <label key={a.id} className={`connection-chip ${selectedConnections.includes(a.id) ? 'active' : ''}`}>
+                        <input type="checkbox" checked={selectedConnections.includes(a.id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedConnections([...selectedConnections, a.id]);
+                            } else {
+                              setSelectedConnections(selectedConnections.filter(c => c !== a.id));
+                            }
+                          }} />
+                        <span className="chip-dot" style={{ background: getHealthColor(a.health_score) }} />
+                        {a.id}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
               <button type="submit" className="modal-submit-btn">
                 <Plus size={18} /> Add to Plant Map
               </button>
