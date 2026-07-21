@@ -17,6 +17,7 @@ import {
   ShieldCheck,
   TrendingUp,
   Factory,
+  Map,
 } from 'lucide-react';
 import '../../styles/Layout.css';
 
@@ -32,6 +33,7 @@ const navigation = [
   {
     section: 'Intelligence',
     items: [
+      { name: 'Digital Twin', path: '/plant-map', icon: Map },
       { name: 'Assets', path: '/assets', icon: Cog },
       { name: 'Compliance', path: '/compliance', icon: ShieldCheck },
       { name: 'Insights', path: '/insights', icon: TrendingUp },

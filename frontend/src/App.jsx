@@ -13,6 +13,7 @@ import Documents from './pages/Documents';
 import Assets from './pages/Assets';
 import Compliance from './pages/Compliance';
 import Insights from './pages/Insights';
+import PlantMap from './pages/PlantMap';
 import './index.css';
 
 const PAGE_TITLES = {
@@ -22,6 +23,7 @@ const PAGE_TITLES = {
   '/assets': { title: 'Assets', subtitle: 'Monitor equipment health and maintenance' },
   '/compliance': { title: 'Compliance', subtitle: 'Track regulatory compliance and gaps' },
   '/insights': { title: 'Insights', subtitle: 'Patterns, trends, and AI-generated recommendations' },
+  '/plant-map': { title: 'Digital Twin', subtitle: 'Interactive plant visualization with real-time asset health' },
 };
 
 function PageWrapper({ children, path }) {
@@ -52,6 +54,7 @@ export default function App() {
             <Route path="/assets" element={<PageWrapper path="/assets"><Assets /></PageWrapper>} />
             <Route path="/compliance" element={<PageWrapper path="/compliance"><Compliance /></PageWrapper>} />
             <Route path="/insights" element={<PageWrapper path="/insights"><Insights /></PageWrapper>} />
+            <Route path="/plant-map" element={<PageWrapper path="/plant-map"><PlantMap /></PageWrapper>} />
           </Routes>
         </main>
       </div>
