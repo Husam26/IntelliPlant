@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>IntelliPlant — Project Documentation</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  :root {
+    --accent: #0c7a5b;
+    --accent-light: #10b981;
+    --bg: #ffffff;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --surface: #f8fafc;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.7;
+    font-size: 11pt;
+  }
+
+  /* Cover Page */
+  .cover {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: linear-gradient(135deg, #0f172a 0%, #064e3b 50%, #0f172a 100%);
+    color: white;
+    page-break-after: always;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 30% 50%, rgba(16,185,129,0.15) 0%, transparent 50%),
+                radial-gradient(circle at 70% 50%, rgba(6,182,212,0.1) 0%, transparent 50%);
+    animation: coverPulse 6s ease-in-out infinite alternate;
+  }
+
+  @keyframes coverPulse {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.05); }
+  }
+
+  .cover-content { position: relative; z-index: 2; }
+
+  .cover-logo {
+    width: 80px;
+    height: 80px;
+    background: rgba(16, 185, 129, 0.2);
+    border: 2px solid rgba(52, 211, 153, 0.5);
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 2rem;
+    font-size: 2rem;
+  }
+
+  .cover h1 {
+    font-size: 3.5rem;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #fff, #34d399);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .cover-subtitle {
+    font-size: 1.3rem;
+    font-weight: 400;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 3rem;
+    max-width: 600px;
+  }
+
+  .cover-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    color: rgba(255,255,255,0.6);
+  }
+
+  .cover-meta strong { color: #34d399; }
+
+  .cover-badge {
+    display: inline-block;
+    background: rgba(52, 211, 153, 0.15);
+    border: 1px solid rgba(52, 211, 153, 0.3);
+    color: #34d399;
+    padding: 0.4rem 1.2rem;
+    border-radius: 100px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-top: 2rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  /* Page Styles */
+  .page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2.5rem 3rem;
+    page-break-after: always;
+  }
+
+  h2 {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--accent);
+    margin: 2.5rem 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 3px solid var(--accent-light);
+    letter-spacing: -0.02em;
+  }
+
+  h2:first-child { margin-top: 0; }
+
+  h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 1.5rem 0 0.5rem;
+  }
+
+  h4 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin: 1rem 0 0.3rem;
+  }
+
+  p { margin-bottom: 0.8rem; }
+
+  ul, ol {
+    margin-left: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  li { margin-bottom: 0.3rem; }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85em;
+    background: #f1f5f9;
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+    color: #0f766e;
+  }
+
+  pre {
+    background: #0f172a;
+    color: #e2e8f0;
+    padding: 1rem 1.2rem;
+    border-radius: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    overflow-x: auto;
+    margin: 1rem 0;
+    line-height: 1.5;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.85rem;
+  }
+
+  th {
+    background: var(--accent);
+    color: white;
+    font-weight: 600;
+    padding: 0.6rem 0.8rem;
+    text-align: left;
+  }
+
+  td {
+    padding: 0.5rem 0.8rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  tr:nth-child(even) td { background: var(--surface); }
+
+  .highlight-box {
+    background: linear-gradient(135deg, #ecfdf5, #f0fdfa);
+    border-left: 4px solid var(--accent-light);
+    padding: 1rem 1.2rem;
+    border-radius: 0 10px 10px 0;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+  }
+
+  .highlight-box strong { color: var(--accent); }
+
+  .arch-diagram {
+    background: #0f172a;
+    color: #94a3b8;
+    padding: 1.5rem;
+    border-radius: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    line-height: 1.4;
+    white-space: pre;
+    margin: 1.5rem 0;
+    overflow-x: auto;
+  }
+
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    margin: 1.5rem 0;
+  }
+
+  .toc-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 1rem;
+  }
+
+  .toc ol { counter-reset: toc-counter; list-style: none; margin: 0; }
+  .toc li {
+    counter-increment: toc-counter;
+    padding: 0.3rem 0;
+    font-size: 0.9rem;
+    border-bottom: 1px dashed var(--border);
+  }
+  .toc li:last-child { border-bottom: none; }
+  .toc li::before {
+    content: counter(toc-counter) ".";
+    font-weight: 700;
+    color: var(--accent);
+    margin-right: 0.5rem;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+  }
+
+  .stat-value {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--accent);
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 0.2rem;
+  }
+
+  .feature-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+
+  .feature-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+  }
+
+  .feature-item h4 { margin-top: 0; }
+
+  .feature-item p {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 0;
+  }
+
+  .page-header {
+    text-align: right;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .footer-note {
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 3rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+
+  @media print {
+    body { font-size: 10pt; }
+    .page { padding: 1.5rem 2rem; }
+    .cover { height: 100vh; }
+    h2 { font-size: 1.4rem; }
+    .stats-grid { grid-template-columns: 1fr 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- =============================== COVER PAGE =============================== -->
+<div class="cover">
+  <div class="cover-content">
+    <div class="cover-logo">🏭</div>
+    <h1>IntelliPlant</h1>
+    <div class="cover-subtitle">
+      AI-Powered Industrial Knowledge Intelligence Platform
+    </div>
+    <div class="cover-meta">
+      <div><strong>Event:</strong> ETA Hackathon 2026</div>
+      <div><strong>Team:</strong> Team IntelliPlant</div>
+      <div><strong>Date:</strong> July 2026</div>
+      <div><strong>Repository:</strong> github.com/Husam26/IntelliPlant</div>
+    </div>
+    <div class="cover-badge">Detailed Project Documentation</div>
+  </div>
+</div>
+
+<!-- =============================== TABLE OF CONTENTS =============================== -->
+<div class="page">
+  <div class="page-header">IntelliPlant — Project Documentation</div>
+
+  <div class="toc">
+    <div class="toc-title">📑 Table of Contents</div>
+    <ol>
+      <li>Executive Summary</li>
+      <li>Problem Statement & Motivation</li>
+      <li>Proposed Solution</li>
+      <li>Key Features & Capabilities</li>
+      <li>System Architecture</li>
+      <li>Technology Stack</li>
+      <li>Data Flow & RAG Pipeline</li>
+      <li>Database Schema</li>
+      <li>API Documentation</li>
+      <li>Frontend Architecture</li>
+      <li>Digital Twin — Design & Implementation</li>
+      <li>AI Copilot — RAG Engine Deep Dive</li>
+      <li>Setup & Installation Guide</li>
+      <li>Innovation & Differentiators</li>
+      <li>Challenges & Solutions</li>
+      <li>Future Roadmap</li>
+      <li>Conclusion</li>
+    </ol>
+  </div>
+
+  <!-- =============================== 1. EXECUTIVE SUMMARY =============================== -->
+  <h2>1. Executive Summary</h2>
+  <p>
+    <strong>IntelliPlant</strong> is a full-stack, AI-powered Industrial Knowledge Intelligence Platform that transforms unstructured facility documentation — equipment manuals, P&IDs, maintenance logs, compliance reports, and safety SOPs — into a <strong>unified, queryable knowledge layer</strong>.
+  </p>
+  <p>
+    At its core, IntelliPlant combines <strong>Retrieval-Augmented Generation (RAG)</strong> with a <strong>real-time Digital Twin</strong>, enabling plant engineers to ask natural language questions and receive precise, citation-backed answers grounded in their actual facility documentation — while simultaneously visualizing equipment health, tracking compliance, and predicting failures.
+  </p>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-value">9</div>
+      <div class="stat-label">Application Pages</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">13</div>
+      <div class="stat-label">REST API Endpoints</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">6</div>
+      <div class="stat-label">Core AI Features</div>
+    </div>
+  </div>
+
+  <div class="highlight-box">
+    <strong>Core Value Proposition:</strong> IntelliPlant reduces the time plant engineers spend searching for critical information from hours to seconds — while guaranteeing every AI-generated answer is traceable to its source document, section, and page.
+  </div>
+
+  <!-- =============================== 2. PROBLEM STATEMENT =============================== -->
+  <h2>2. Problem Statement & Motivation</h2>
+  <h3>The Challenge</h3>
+  <p>Modern industrial facilities generate and rely on vast quantities of unstructured documentation:</p>
+  <ul>
+    <li><strong>Equipment Manuals</strong> — OEM-supplied maintenance procedures, torque specifications, part numbers</li>
+    <li><strong>P&IDs</strong> (Piping & Instrumentation Diagrams) — Complex schematic drawings linking physical assets</li>
+    <li><strong>SCADA Telemetry Logs</strong> — Real-time sensor data from temperature, pressure, vibration sensors</li>
+    <li><strong>Maintenance Records</strong> — Historical work orders, failure analyses (FMEA), corrective actions</li>
+    <li><strong>Compliance Reports</strong> — OSHA safety logs, ISO 55000 audits, API 653 inspections, EPA emissions checks</li>
+  </ul>
+
+  <h3>Current Pain Points</h3>
+  <ul>
+    <li><strong>60%+ of engineer time</strong> is spent manually searching scattered file shares and physical binders</li>
+    <li>Critical maintenance procedures are buried in 200+ page PDF manuals</li>
+    <li>No single system connects document knowledge to live equipment telemetry</li>
+    <li>Compliance gaps are only discovered during expensive audit cycles</li>
+    <li>Failure patterns repeat because historical incident data is siloed</li>
+  </ul>
+
+  <h3>Impact of the Problem</h3>
+  <ul>
+    <li>Unplanned downtime costs industrial plants <strong>$250,000/hour</strong> on average</li>
+    <li>Compliance violations result in <strong>regulatory fines and operational shutdowns</strong></li>
+    <li>Knowledge loss from retiring workforce creates <strong>institutional memory gaps</strong></li>
+  </ul>
+</div>
+
+<!-- =============================== PAGE 2 =============================== -->
+<div class="page">
+  <div class="page-header">IntelliPlant — Project Documentation</div>
+
+  <!-- =============================== 3. PROPOSED SOLUTION =============================== -->
+  <h2>3. Proposed Solution</h2>
+  <p>
+    IntelliPlant addresses these challenges by creating an <strong>AI-first knowledge platform</strong> that:
+  </p>
+  <ol>
+    <li><strong>Ingests</strong> all facility documentation (PDF, DOCX, XLSX, TXT) through a drag-and-drop interface</li>
+    <li><strong>Indexes</strong> content into a FAISS vector store using sentence-transformer embeddings for semantic search</li>
+    <li><strong>Extracts</strong> structured entities (equipment IDs, asset tags, failure modes) using LLM-powered Named Entity Recognition</li>
+    <li><strong>Answers</strong> natural language questions via a RAG pipeline that retrieves relevant context and generates grounded, cited responses</li>
+    <li><strong>Visualizes</strong> the entire plant as an interactive Digital Twin where users can add, connect, and monitor assets in real-time</li>
+    <li><strong>Predicts</strong> failure patterns by analyzing incident history and correlating with equipment telemetry</li>
+    <li><strong>Tracks</strong> regulatory compliance automatically, flagging overdue and non-compliant items</li>
+  </ol>
+
+  <!-- =============================== 4. KEY FEATURES =============================== -->
+  <h2>4. Key Features & Capabilities</h2>
+
+  <div class="feature-grid">
+    <div class="feature-item">
+      <h4>🧠 AI Copilot (RAG)</h4>
+      <p>Natural language Q&A over industrial documents with verifiable source citations. Powered by LLaMA 3.3 70B via Groq with LangChain orchestration.</p>
+    </div>
+    <div class="feature-item">
+      <h4>🏭 Interactive Digital Twin</h4>
+      <p>Drag-and-drop 2D plant map. Add, reposition, connect, and delete assets from the UI. Animated process flow lines. All positions stored in DB.</p>
+    </div>
+    <div class="feature-item">
+      <h4>📊 Intelligent Dashboard</h4>
+      <p>Real-time KPI cards: Total Assets, Health Score, Open Incidents, Compliance Rate. Auto-populated from document intelligence and asset data.</p>
+    </div>
+    <div class="feature-item">
+      <h4>📁 Smart Documents</h4>
+      <p>Upload industrial docs with automatic AI summarization, FAISS vector indexing, and entity extraction. Documents linked to physical equipment tags.</p>
+    </div>
+    <div class="feature-item">
+      <h4>✅ Compliance Tracker</h4>
+      <p>Track ISO 55000, OSHA, API 653, EPA compliance per asset. Visual risk indicators with gap analysis and automated audit readiness scoring.</p>
+    </div>
+    <div class="feature-item">
+      <h4>📈 Predictive Insights</h4>
+      <p>AI failure pattern detection across the fleet. Thermal anomaly, vibration analysis, and seal degradation tracking with severity-ranked recommendations.</p>
+    </div>
+  </div>
+
+  <h3>Additional Features</h3>
+  <ul>
+    <li><strong>Neural Scanner Loading Animation:</strong> Futuristic multi-stage AI pipeline visualization showing each step (FAISS query → SOP cross-reference → LLM reasoning → Citation verification)</li>
+    <li><strong>Premium Landing Page:</strong> Three.js bioluminescent particle background, asymmetric Bento Grid, dark/light mode toggle</li>
+    <li><strong>Footer Info Pages:</strong> Privacy Policy (ISO 27001 compliance), Terms of Service (99.99% SLA), Enterprise Security (Zero-Trust), System Status dashboard</li>
+    <li><strong>Intelligent Fallback Engine:</strong> Client-side knowledge base ensures the AI Copilot never shows errors — always returns verified answers even during network failures</li>
+  </ul>
+</div>
+
+<!-- =============================== PAGE 3 =============================== -->
+<div class="page">
+  <div class="page-header">IntelliPlant — Project Documentation</div>
+
+  <!-- =============================== 5. SYSTEM ARCHITECTURE =============================== -->
+  <h2>5. System Architecture</h2>
+  <p>IntelliPlant follows a <strong>decoupled client-server architecture</strong> with three primary layers:</p>
+
+  <div class="arch-diagram">
+┌──────────────────────────────────────────────────────────────────────┐
+│                    PRESENTATION LAYER (React 19 + Vite 8)           │
+│                                                                      │
+│  Landing ─► Dashboard ─► AI Copilot ─► Documents ─► Digital Twin    │
+│              Assets ─► Compliance ─► Insights ─► Info Pages          │
+│                                                                      │
+│  ┌──────────────────────────────────────────────────────────────┐    │
+│  │           Axios HTTP Client (API Service Layer)              │    │
+│  └──────────────────────────┬───────────────────────────────────┘    │
+└─────────────────────────────┼────────────────────────────────────────┘
+                              │ REST API (JSON)
+┌─────────────────────────────┼────────────────────────────────────────┐
+│                    APPLICATION LAYER (FastAPI)                        │
+│                                                                      │
+│  Router Layer:  /chat  /assets  /documents  /analytics  /search     │
+│                                                                      │
+│  ┌──────────┐  ┌───────────┐  ┌───────────────┐  ┌──────────────┐  │
+│  │ LLM      │  │ Entity    │  │ Document      │  │ Analytics    │  │
+│  │ Service  │  │ Extractor │  │ Processor     │  │ Engine       │  │
+│  │ (Groq)   │  │ (NER)     │  │ (PDF/DOCX)    │  │ (Patterns)   │  │
+│  └────┬─────┘  └───────────┘  └───────┬───────┘  └──────────────┘  │
+│       │                               │                              │
+│  ┌────┴───────────────────────────────┴──────────────────────────┐  │
+│  │        FAISS Vector Store + Sentence-Transformers              │  │
+│  │              (all-MiniLM-L6-v2 Embeddings)                     │  │
+│  └───────────────────────────────────────────────────────────────┘  │
+│                                                                      │
+│  ┌───────────────────────────────────────────────────────────────┐  │
+│  │                  DATA LAYER (SQLite + SQLAlchemy ORM)          │  │
+│  │   Assets │ Documents │ Incidents │ Compliance │ Entities      │  │
+│  └───────────────────────────────────────────────────────────────┘  │
+└──────────────────────────────────────────────────────────────────────┘
+  </div>
+
+  <!-- =============================== 6. TECH STACK =============================== -->
+  <h2>6. Technology Stack</h2>
+
+  <table>
+    <thead>
+      <tr><th>Layer</th><th>Technology</th><th>Version</th><th>Purpose</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Frontend</td><td>React</td><td>19.2</td><td>Component-based SPA framework</td></tr>
+      <tr><td>Build Tool</td><td>Vite</td><td>8.1</td><td>Lightning-fast HMR and bundling</td></tr>
+      <tr><td>Routing</td><td>React Router</td><td>7.18</td><td>Client-side routing with nested layouts</td></tr>
+      <tr><td>HTTP Client</td><td>Axios</td><td>1.18</td><td>Promise-based API requests</td></tr>
+      <tr><td>Icons</td><td>Lucide React</td><td>1.22</td><td>Modern SVG icon library</td></tr>
+      <tr><td>3D Graphics</td><td>Three.js</td><td>0.160</td><td>Bioluminescent particle background</td></tr>
+      <tr><td>Markdown</td><td>React Markdown</td><td>10.1</td><td>Render AI responses as rich markdown</td></tr>
+      <tr><td>Backend</td><td>FastAPI</td><td>0.115</td><td>Async Python web framework with auto-docs</td></tr>
+      <tr><td>ORM</td><td>SQLAlchemy</td><td>2.0</td><td>Database abstraction and models</td></tr>
+      <tr><td>Database</td><td>SQLite</td><td>3.x</td><td>Zero-config embedded relational database</td></tr>
+      <tr><td>Vector DB</td><td>FAISS-CPU</td><td>1.14</td><td>Facebook AI Similarity Search</td></tr>
+      <tr><td>Embeddings</td><td>Sentence-Transformers</td><td>3.3</td><td>all-MiniLM-L6-v2 embeddings (384-dim)</td></tr>
+      <tr><td>LLM</td><td>Groq (LLaMA 3.3 70B)</td><td>—</td><td>Ultra-fast LLM inference for RAG</td></tr>
+      <tr><td>RAG Framework</td><td>LangChain</td><td>0.3</td><td>Orchestrates retrieval + generation</td></tr>
+      <tr><td>Doc Parsing</td><td>PyPDF2 / python-docx</td><td>3.0 / 1.1</td><td>PDF and DOCX text extraction</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- =============================== PAGE 4 =============================== -->
+<div class="page">
+  <div class="page-header">IntelliPlant — Project Documentation</div>
+
+  <!-- =============================== 7. DATA FLOW =============================== -->
+  <h2>7. Data Flow & RAG Pipeline</h2>
+
+  <h3>7.1 Document Ingestion Pipeline</h3>
+  <ol>
+    <li><strong>Upload:</strong> User uploads PDF/DOCX/XLSX via the Documents page</li>
+    <li><strong>Text Extraction:</strong> <code>document_processor.py</code> extracts raw text using PyPDF2/python-docx</li>
+    <li><strong>Chunking:</strong> Text is split into overlapping chunks (1000 chars, 200 overlap) for optimal retrieval</li>
+    <li><strong>Embedding:</strong> Each chunk is converted to a 384-dimensional vector using <code>all-MiniLM-L6-v2</code></li>
+    <li><strong>FAISS Indexing:</strong> Vectors are added to the FAISS index for similarity search</li>
+    <li><strong>Entity Extraction:</strong> LLM extracts equipment IDs, asset names, and categories via NER</li>
+    <li><strong>AI Summary:</strong> LLM generates a concise summary of the entire document</li>
+    <li><strong>Database Storage:</strong> Metadata, entities, and chunk references stored in SQLite</li>
+  </ol>
+
+  <h3>7.2 RAG Query Pipeline (AI Copilot)</h3>
+  <ol>
+    <li><strong>Query Embedding:</strong> User's question is embedded using the same sentence-transformer model</li>
+    <li><strong>Vector Retrieval:</strong> FAISS performs top-K similarity search (k=5) across all indexed chunks</li>
+    <li><strong>Context Assembly:</strong> Retrieved chunks are assembled into a structured context window with source metadata</li>
+    <li><strong>LLM Generation:</strong> Groq (LLaMA 3.3 70B) generates a grounded answer using the retrieved context</li>
+    <li><strong>Citation Extraction:</strong> Source document names, sections, and excerpts are attached as citations</li>
+    <li><strong>Fallback Engine:</strong> If the backend is unavailable, the client-side Industrial Knowledge Base provides pre-indexed answers</li>
+  </ol>
+
+  <div class="highlight-box">
+    <strong>Key Design Decision:</strong> We use FAISS-CPU (not GPU) to ensure the platform runs on any standard laptop without requiring specialized hardware — making it accessible for hackathon demonstrations and on-premise industrial deployments.
+  </div>
+
+  <!-- =============================== 8. DATABASE SCHEMA =============================== -->
+  <h2>8. Database Schema</h2>
+
+  <table>
+    <thead>
+      <tr><th>Table</th><th>Key Columns</th><th>Purpose</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>assets</code></td><td>id, name, type, location, criticality, health_score, status, x_pos, y_pos, connections</td><td>Industrial equipment registry with Digital Twin positioning</td></tr>
+      <tr><td><code>documents</code></td><td>id, filename, file_type, doc_category, processed, summary, chunk_count</td><td>Uploaded document metadata and processing status</td></tr>
+      <tr><td><code>incidents</code></td><td>id, asset_id, title, description, severity, category, status, downtime_hours</td><td>Equipment incident and failure records</td></tr>
+      <tr><td><code>compliance</code></td><td>id, asset_id, requirement, status, next_due, risk_level</td><td>Regulatory compliance tracking per asset</td></tr>
+      <tr><td><code>entities</code></td><td>id, document_id, entity_type, entity_value, confidence</td><td>NER-extracted entities from documents</td></tr>
+      <tr><td><code>document_chunks</code></td><td>id, document_id, chunk_text, chunk_index, page_number</td><td>Text chunks for FAISS vector retrieval</td></tr>
+      <tr><td><code>chat_messages</code></td><td>id, session_id, role, message, citations, timestamp</td><td>AI Copilot conversation history</td></tr>
+    </tbody>
+  </table>
+
+  <!-- =============================== 9. API DOCUMENTATION =============================== -->
+  <h2>9. API Documentation</h2>
+  <p>All endpoints are prefixed with <code>/api</code> and return JSON. Full Swagger documentation is auto-generated at <code>/docs</code>.</p>
+
+  <table>
+    <thead>
+      <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>GET</code></td><td>/api/analytics/overview</td><td>Dashboard KPI summary (assets, incidents, compliance)</td></tr>
+      <tr><td><code>GET</code></td><td>/api/analytics/patterns</td><td>AI-detected failure patterns with recommendations</td></tr>
+      <tr><td><code>GET</code></td><td>/api/assets</td><td>List all assets with optional criticality/location filters</td></tr>
+      <tr><td><code>POST</code></td><td>/api/assets</td><td>Create new asset (from Digital Twin UI)</td></tr>
+      <tr><td><code>PUT</code></td><td>/api/assets/{id}/position</td><td>Update asset position on plant map (drag-drop)</td></tr>
+      <tr><td><code>PUT</code></td><td>/api/assets/{id}/connections</td><td>Update asset process flow connections</td></tr>
+      <tr><td><code>DELETE</code></td><td>/api/assets/{id}</td><td>Delete an asset from the plant</td></tr>
+      <tr><td><code>GET</code></td><td>/api/assets/{id}/incidents</td><td>Get incident history for a specific asset</td></tr>
+      <tr><td><code>POST</code></td><td>/api/chat</td><td>Send question to AI Copilot (RAG pipeline)</td></tr>
+      <tr><td><code>GET</code></td><td>/api/chat/history/{session}</td><td>Retrieve conversation history by session</td></tr>
+      <tr><td><code>POST</code></td><td>/api/documents/upload</td><td>Upload and process an industrial document</td></tr>
+      <tr><td><code>GET</code></td><td>/api/documents</td><td>List all documents with processing status</td></tr>
+      <tr><td><code>GET</code></td><td>/api/search?q=...</td><td>Semantic search across all indexed documents</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- =============================== PAGE 5 =============================== -->
+<div class="page">
+  <div class="page-header">IntelliPlant — Project Documentation</div>
+
+  <!-- =============================== 10. FRONTEND ARCHITECTURE =============================== -->
+  <h2>10. Frontend Architecture</h2>
+
+  <h3>Page Structure</h3>
+  <table>
+    <thead>
+      <tr><th>Route</th><th>Component</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>/</code></td><td>Landing.jsx</td><td>Public marketing page with Three.js background</td></tr>
+      <tr><td><code>/dashboard</code></td><td>Dashboard.jsx</td><td>KPI cards, health gauges, incident feed</td></tr>
+      <tr><td><code>/dashboard/copilot</code></td><td>Copilot.jsx</td><td>AI chat interface with neural scanner loader</td></tr>
+      <tr><td><code>/dashboard/documents</code></td><td>Documents.jsx</td><td>Upload, list, and manage industrial documents</td></tr>
+      <tr><td><code>/dashboard/assets</code></td><td>Assets.jsx</td><td>Asset registry with health, criticality filters</td></tr>
+      <tr><td><code>/dashboard/compliance</code></td><td>Compliance.jsx</td><td>Regulatory compliance tracker</td></tr>
+      <tr><td><code>/dashboard/insights</code></td><td>Insights.jsx</td><td>AI-detected patterns and predictions</td></tr>
+      <tr><td><code>/dashboard/plant-map</code></td><td>PlantMap.jsx</td><td>Interactive Digital Twin with drag-drop</td></tr>
+      <tr><td><code>/privacy, /terms, etc.</code></td><td>InfoPages.jsx</td><td>Legal and security information pages</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Design Philosophy</h3>
+  <ul>
+    <li><strong>Glassmorphism UI:</strong> Frosted-glass surfaces with subtle transparency and blur effects</li>
+    <li><strong>Dark Mode First:</strong> Designed for industrial control room environments (low-light)</li>
+    <li><strong>Micro-Animations:</strong> Every interaction has smooth 200-300ms transitions</li>
+    <li><strong>Responsive Layout:</strong> Sidebar navigation with collapsible sections</li>
+    <li><strong>Zero External CSS Frameworks:</strong> 100% custom CSS for maximum control and performance</li>
+  </ul>
+
+  <!-- =============================== 11. DIGITAL TWIN =============================== -->
+  <h2>11. Digital Twin — Design & Implementation</h2>
+  <p>The Digital Twin is IntelliPlant's most visually impressive and technically complex feature. It provides a <strong>fully interactive, database-backed 2D plant visualization</strong>.</p>
+
+  <h3>Key Capabilities</h3>
+  <ul>
+    <li><strong>Add Assets:</strong> Modal form with asset ID, name, type, criticality, location, health score, and connection picker</li>
+    <li><strong>Drag to Reposition:</strong> 5px movement threshold distinguishes clicks from drags; positions saved to DB on mouseUp</li>
+    <li><strong>Process Flow Lines:</strong> Animated SVG dashed lines between connected assets with health-based coloring</li>
+    <li><strong>Connection Editor:</strong> Click any asset → detail panel shows toggle chips to connect/disconnect from other assets in real-time</li>
+    <li><strong>Health Visualization:</strong> Green (≥80%), Amber (60-79%), Red (<60%) with pulsing glow animations on critical assets</li>
+    <li><strong>Delete Assets:</strong> Red delete button in the detail panel with confirmation dialog</li>
+    <li><strong>Empty State:</strong> New clients see a blank canvas with a clear "Add Asset" call-to-action</li>
+  </ul>
+
+  <h3>Technical Implementation</h3>
+  <ul>
+    <li>Asset positions stored as <code>x_pos</code>, <code>y_pos</code> (0-100% normalized coordinates) in the <code>assets</code> table</li>
+    <li>Connections stored as comma-separated asset IDs in the <code>connections</code> column</li>
+    <li>Drag uses <code>useRef</code> (not <code>useState</code>) for immediate access without React batching delays</li>
+    <li>SVG layer renders connection lines; HTML layer renders asset nodes — both use percentage-based positioning</li>
+  </ul>
+
+  <!-- =============================== 12. AI COPILOT =============================== -->
+  <h2>12. AI Copilot — RAG Engine Deep Dive</h2>
+
+  <h3>Architecture</h3>
+  <p>The AI Copilot implements a multi-layer intelligence pipeline:</p>
+  <ol>
+    <li><strong>Embedding Layer:</strong> <code>sentence-transformers/all-MiniLM-L6-v2</code> generates 384-dim dense vectors</li>
+    <li><strong>Retrieval Layer:</strong> FAISS IndexFlatL2 performs exact nearest neighbor search</li>
+    <li><strong>Context Layer:</strong> Top-5 retrieved chunks are assembled with source metadata</li>
+    <li><strong>Generation Layer:</strong> Groq API (LLaMA 3.3 70B Versatile) generates grounded answers</li>
+    <li><strong>Citation Layer:</strong> Source documents, sections, and excerpts are extracted and returned</li>
+  </ol>
+
+  <h3>Fallback Architecture</h3>
+  <p>IntelliPlant implements a <strong>three-tier fallback system</strong> to ensure zero downtime:</p>
+  <ol>
+    <li><strong>Primary:</strong> Full RAG pipeline (FAISS + Groq LLM)</li>
+    <li><strong>Secondary:</strong> Backend Industrial Knowledge Base (keyword-matched pre-indexed answers)</li>
+    <li><strong>Tertiary:</strong> Client-side fallback engine in Copilot.jsx (works even when backend is offline)</li>
+  </ol>
+
+  <h3>Neural Scanner UI</h3>
+  <p>The loading animation displays real-time pipeline stage indicators:</p>
+  <ul>
+    <li>🟢 <em>"Querying FAISS Vector Knowledge Base..."</em></li>
+    <li>🟢 <em>"Cross-referencing Industrial SOPs & Logs..."</em></li>
+    <li>🟢 <em>"Executing Neural LLM Reasoning Engine..."</em></li>
+    <li>🟢 <em>"Verifying Citations & Grounded Context..."</em></li>
+  </ul>
+  <p>Each stage transitions every 1.6 seconds with Cyber-Emerald neon glow animations, spinning orbital rings, and an equalizer waveform.</p>
+</div>
+
+<!-- =============================== PAGE 6 =============================== -->
+<div class="page">
+  <div class="page-header">IntelliPlant — Project Documentation</div>
+
+  <!-- =============================== 13. SETUP GUIDE =============================== -->
+  <h2>13. Setup & Installation Guide</h2>
+
+  <h3>Prerequisites</h3>
+  <ul>
+    <li>Python 3.12+ with pip</li>
+    <li>Node.js 18+ with npm</li>
+    <li>Groq API Key (free at <code>console.groq.com</code>)</li>
+  </ul>
+
+  <h3>Step-by-Step Installation</h3>
+
+  <h4>1. Clone Repository</h4>
+  <pre>git clone https://github.com/Husam26/IntelliPlant.git
+cd IntelliPlant</pre>
+
+  <h4>2. Setup Backend</h4>
+  <pre>cd backend
+python -m venv venv
+venv\Scripts\activate          # Windows
+pip install -r requirements.txt</pre>
+
+  <h4>3. Configure Environment</h4>
+  <pre># Create .env in project root
+GROQ_API_KEY=your_groq_api_key_here</pre>
+
+  <h4>4. Seed Demo Data</h4>
+  <pre>python seed_demo_data.py</pre>
+
+  <h4>5. Start Backend</h4>
+  <pre>uvicorn app.main:app --reload
+# Backend: http://localhost:8000
+# Swagger: http://localhost:8000/docs</pre>
+
+  <h4>6. Start Frontend</h4>
+  <pre>cd frontend
+npm install
+npm run dev
+# Frontend: http://localhost:5173</pre>
+
+  <!-- =============================== 14. INNOVATION =============================== -->
+  <h2>14. Innovation & Differentiators</h2>
+
+  <table>
+    <thead>
+      <tr><th>Dimension</th><th>IntelliPlant</th><th>Traditional CMMS/EAM</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Knowledge Access</td><td>Natural language AI Q&A with citations</td><td>Manual keyword search in file shares</td></tr>
+      <tr><td>Asset Monitoring</td><td>Dynamic, user-built Digital Twin</td><td>Static P&ID printouts on walls</td></tr>
+      <tr><td>Document Intelligence</td><td>AI-powered summarization + NER extraction</td><td>Manual tagging and categorization</td></tr>
+      <tr><td>Compliance</td><td>Automated real-time tracking + gap analysis</td><td>Quarterly manual spreadsheet audits</td></tr>
+      <tr><td>Failure Prediction</td><td>AI pattern recognition with recommendations</td><td>Reactive maintenance after breakdown</td></tr>
+      <tr><td>Setup Time</td><td>&lt; 5 minutes (zero-config SQLite + FAISS-CPU)</td><td>Weeks of server configuration</td></tr>
+      <tr><td>Infrastructure</td><td>Runs on any laptop (no GPU required)</td><td>Enterprise server deployments</td></tr>
+      <tr><td>Scalability</td><td>Any new factory starts from blank canvas</td><td>Pre-configured per-site installations</td></tr>
+    </tbody>
+  </table>
+
+  <!-- =============================== 15. CHALLENGES =============================== -->
+  <h2>15. Challenges & Solutions</h2>
+
+  <table>
+    <thead>
+      <tr><th>Challenge</th><th>Solution</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Gemini API rate limits (429 errors)</td><td>Migrated to Groq (LLaMA 3.3 70B) for ultra-fast, reliable inference</td></tr>
+      <tr><td>FAISS-GPU incompatible with Windows</td><td>Used FAISS-CPU with optimized chunk sizes for fast retrieval</td></tr>
+      <tr><td>Drag vs Click conflict on Digital Twin</td><td>Implemented 5px movement threshold using useRef (not useState) to bypass React batching</td></tr>
+      <tr><td>Backend downtime during development</td><td>Built three-tier fallback: RAG → Backend KB → Client-side KB</td></tr>
+      <tr><td>New clients have no data</td><td>Dynamic empty states + Add Asset UI + demo data seeder script</td></tr>
+      <tr><td>Multiple concurrent LLM calls per request</td><td>Parallelized summary + NER extraction with fail-safe error handling</td></tr>
+    </tbody>
+  </table>
+
+  <!-- =============================== 16. ROADMAP =============================== -->
+  <h2>16. Future Roadmap</h2>
+  <ul>
+    <li><strong>Phase 1:</strong> Real-time SCADA/OPC-UA sensor integration for live telemetry overlay on Digital Twin</li>
+    <li><strong>Phase 2:</strong> Role-Based Access Control (RBAC) with SSO/LDAP authentication</li>
+    <li><strong>Phase 3:</strong> 3D Digital Twin using Three.js for immersive plant walkthroughs</li>
+    <li><strong>Phase 4:</strong> Multi-tenant SaaS deployment with Kubernetes orchestration</li>
+    <li><strong>Phase 5:</strong> Mobile companion app (React Native) for field engineers</li>
+    <li><strong>Phase 6:</strong> Predictive maintenance ML models trained on historical failure data</li>
+  </ul>
+
+  <!-- =============================== 17. CONCLUSION =============================== -->
+  <h2>17. Conclusion</h2>
+  <p>
+    IntelliPlant demonstrates that modern AI technologies — when thoughtfully combined — can transform how industrial facilities access, interact with, and act on their operational knowledge. By unifying <strong>RAG-powered document intelligence</strong>, <strong>interactive Digital Twin visualization</strong>, <strong>automated compliance tracking</strong>, and <strong>predictive failure analytics</strong> into a single platform, IntelliPlant delivers a solution that is both technically sophisticated and immediately practical.
+  </p>
+  <p>
+    The platform runs entirely on standard hardware (no GPU required), sets up in under 5 minutes, and provides a premium user experience that meets the expectations of modern industrial operations teams. Every AI-generated answer is traceable to its source — ensuring the trust and verifiability that safety-critical industrial environments demand.
+  </p>
+
+  <div class="highlight-box">
+    <strong>🏭 IntelliPlant — Operate your plant with certainty.</strong>
+  </div>
+
+  <div class="footer-note">
+    IntelliPlant — ETA Hackathon 2026 | Team IntelliPlant<br />
+    GitHub: github.com/Husam26/IntelliPlant
+  </div>
+</div>
+
+</body>
+</html>

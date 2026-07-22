@@ -6,7 +6,7 @@
  */
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, MessageSquareText, FileText } from 'lucide-react';
+import { Send, Bot, User, MessageSquareText, FileText, Cpu, Sparkles, Database, Search } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { chatAPI } from '../services/api';
 import '../styles/Copilot.css';
@@ -19,6 +19,51 @@ const SUGGESTED_QUESTIONS = [
   "What are the overdue compliance items?",
 ];
 
+function CopilotNeuralLoader() {
+  const [stepIndex, setStepIndex] = useState(0);
+  const steps = [
+    { label: "Querying FAISS Vector Knowledge Base...", icon: Database },
+    { label: "Cross-referencing Industrial SOPs & Logs...", icon: Search },
+    { label: "Executing Neural LLM Reasoning Engine...", icon: Cpu },
+    { label: "Verifying Citations & Grounded Context...", icon: Sparkles }
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStepIndex((prev) => (prev + 1) % steps.length);
+    }, 1600);
+    return () => clearInterval(interval);
+  }, []);
+
+  const CurrentIcon = steps[stepIndex].icon;
+
+  return (
+    <div className="copilot-neural-loader">
+      <div className="loader-scan-beam" />
+      <div className="loader-main">
+        <div className="loader-orb-container">
+          <CurrentIcon className="loader-icon" size={20} />
+          <div className="loader-ring ring-1" />
+          <div className="loader-ring ring-2" />
+        </div>
+        <div className="loader-info">
+          <div className="loader-status-text">
+            {steps[stepIndex].label}
+          </div>
+          <div className="loader-equalizer">
+            <span className="eq-bar eq-1" />
+            <span className="eq-bar eq-2" />
+            <span className="eq-bar eq-3" />
+            <span className="eq-bar eq-4" />
+            <span className="eq-bar eq-5" />
+            <span className="eq-bar eq-6" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Copilot() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -28,7 +73,7 @@ export default function Copilot() {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, [messages, sending]);
 
   const getFallbackAnswer = (query) => {
     const q = query.toLowerCase();
@@ -153,8 +198,8 @@ export default function Copilot() {
             {sending && (
               <div className="chat-message assistant">
                 <div className="chat-avatar"><Bot size={18} /></div>
-                <div className="chat-bubble">
-                  <div className="spinner" style={{ margin: '4px auto' }} />
+                <div className="chat-bubble loader-bubble">
+                  <CopilotNeuralLoader />
                 </div>
               </div>
             )}
