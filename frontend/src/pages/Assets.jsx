@@ -36,62 +36,71 @@ export default function Assets() {
   }
 
   function getHealthColor(score) {
-    if (score >= 80) return 'var(--accent-success)';
-    if (score >= 60) return 'var(--accent-secondary)';
-    return 'var(--accent-danger)';
+    if (score >= 80) return 'var(--ip-accent)';
+    if (score >= 60) return 'var(--ip-warning)';
+    return 'var(--ip-danger)';
+  }
+
+  function getSeverityBadge(severity) {
+    const cls = severity?.toLowerCase() || 'info';
+    if (cls === 'high' || cls === 'critical') return 'ip-badge ip-badge-danger';
+    if (cls === 'medium') return 'ip-badge ip-badge-warning';
+    if (cls === 'low') return 'ip-badge ip-badge-good';
+    return `ip-badge ip-badge-info`;
   }
 
   if (loading) {
-    return <div className="page-content"><div className="spinner spinner-lg" style={{ margin: '48px auto' }} /></div>;
+    return <div className="page-content flex-row" style={{ justifyContent: 'center' }}><div className="spinner spinner-lg" style={{ color: 'var(--ip-accent)', margin: '48px auto' }} /></div>;
   }
 
   return (
     <div className="page-content">
-      <div style={{ display: 'grid', gridTemplateColumns: selectedAsset ? '1fr 1fr' : '1fr', gap: 'var(--space-lg)' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: selectedAsset ? '1fr 1fr' : '1fr', gap: '1.5rem' }}>
         {/* Asset List */}
         <div>
-          <div className="section-title" style={{ marginBottom: 'var(--space-lg)' }}>
-            <h2>Equipment Inventory ({assets.length})</h2>
+          <div className="section-title" style={{ marginBottom: '1.5rem', borderBottom: '1px solid var(--ip-border)', paddingBottom: '0.75rem' }}>
+            <h2 style={{ fontFamily: 'var(--ip-font-display)', fontSize: '1.25rem', color: 'var(--ip-text)' }}>Equipment Inventory ({assets.length})</h2>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {assets.map((asset, i) => (
               <div
                 key={asset.id}
-                className="card animate-fade-in"
+                className="ip-card ip-card-link"
                 style={{
-                  cursor: 'pointer',
-                  animationDelay: `${i * 0.05}s`,
-                  border: selectedAsset?.id === asset.id ? '1px solid var(--accent-primary)' : undefined,
-                  background: selectedAsset?.id === asset.id ? 'rgba(59, 130, 246, 0.05)' : undefined,
+                  padding: '1.25rem',
+                  animation: `ip-fade-in 0.3s var(--ip-ease) ${i * 0.05}s both`,
+                  borderColor: selectedAsset?.id === asset.id ? 'var(--ip-accent)' : undefined,
+                  background: selectedAsset?.id === asset.id ? 'var(--ip-accent-soft)' : undefined,
                 }}
                 onClick={() => selectAsset(asset)}
               >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                     <div style={{
                       width: 44, height: 44,
-                      borderRadius: 'var(--radius-md)',
-                      background: 'rgba(59, 130, 246, 0.1)',
+                      borderRadius: 'var(--ip-radius-sm)',
+                      background: 'var(--ip-info-soft)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      color: 'var(--accent-primary)'
+                      color: 'var(--ip-info)',
+                      border: '1px solid var(--ip-info-border)'
                     }}>
                       <Cog size={22} />
                     </div>
                     <div>
-                      <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--accent-primary)', fontSize: '0.9rem' }}>
+                      <div style={{ fontFamily: 'var(--ip-font-mono)', fontWeight: 600, color: 'var(--ip-text)', fontSize: '0.9rem' }}>
                         {asset.id}
                       </div>
-                      <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{asset.name}</div>
+                      <div style={{ fontSize: '0.85rem', color: 'var(--ip-text-muted)' }}>{asset.name}</div>
                     </div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '1.4rem', fontWeight: 700, color: getHealthColor(asset.health_score) }}>
+                    <div style={{ fontFamily: 'var(--ip-font-mono)', fontSize: '1.5rem', fontWeight: 600, color: getHealthColor(asset.health_score) }}>
                       {asset.health_score}%
                     </div>
-                    <span className={`badge badge-${asset.criticality?.toLowerCase()}`}>{asset.criticality}</span>
+                    <span className={getSeverityBadge(asset.criticality)}>{asset.criticality}</span>
                   </div>
                 </div>
-                <div style={{ display: 'flex', gap: 'var(--space-lg)', marginTop: 'var(--space-md)', fontSize: '0.8rem', color: 'var(--text-tertiary)' }}>
+                <div style={{ display: 'flex', gap: '1.5rem', marginTop: '1rem', fontSize: '0.8125rem', color: 'var(--ip-text-faint)' }}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><MapPin size={14} /> {asset.location}</span>
                   <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Cog size={14} /> {asset.type}</span>
                   <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><AlertTriangle size={14} /> {asset.incident_count} incidents</span>
@@ -101,68 +110,69 @@ export default function Assets() {
           </div>
         </div>
 
-        {/* Asset Detail Panel */}
+        {/* Asset Details Sidebar */}
         {selectedAsset && (
-          <div className="animate-slide-in">
-            <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>
-              <h2 style={{ marginBottom: 'var(--space-lg)' }}>
-                <Activity size={20} style={{ marginRight: 8, verticalAlign: 'middle' }} />
-                {selectedAsset.id} — Details
-              </h2>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-md)' }}>
-                {[
-                  ['Type', selectedAsset.type],
-                  ['Location', selectedAsset.location],
-                  ['Status', selectedAsset.status],
-                  ['Criticality', selectedAsset.criticality],
-                  ['Manufacturer', selectedAsset.manufacturer || '—'],
-                  ['Install Date', selectedAsset.install_date || '—'],
-                  ['Last Maintenance', selectedAsset.last_maintenance || '—'],
-                  ['Next Scheduled', selectedAsset.next_scheduled || '—'],
-                ].map(([label, value]) => (
-                  <div key={label} style={{ padding: 'var(--space-sm) 0', borderBottom: '1px solid var(--border-color)' }}>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{label}</div>
-                    <div style={{ fontSize: '0.9rem', fontWeight: 500, marginTop: 2 }}>{value}</div>
-                  </div>
-                ))}
+          <div className="ip-panel" style={{ padding: '1.5rem', height: 'fit-content', position: 'sticky', top: '100px', animation: 'ip-fade-in 0.3s var(--ip-ease)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
+              <div>
+                <h3 style={{ fontFamily: 'var(--ip-font-display)', fontSize: '1.5rem', color: 'var(--ip-text)' }}>{selectedAsset.id}</h3>
+                <p style={{ color: 'var(--ip-text-muted)' }}>{selectedAsset.name}</p>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: '0.6875rem', textTransform: 'uppercase', color: 'var(--ip-text-faint)', letterSpacing: '0.08em', fontFamily: 'var(--ip-font-mono)' }}>Health Score</div>
+                <div style={{ fontFamily: 'var(--ip-font-mono)', fontSize: '2rem', fontWeight: 600, color: getHealthColor(selectedAsset.health_score), lineHeight: 1 }}>
+                  {selectedAsset.health_score}%
+                </div>
               </div>
             </div>
 
-            {/* Incident History */}
-            <div className="card">
-              <h3 style={{ marginBottom: 'var(--space-md)' }}>Incident History ({incidents.length})</h3>
-              {incidents.length === 0 ? (
-                <div className="empty-state" style={{ padding: 'var(--space-lg)' }}>
-                  <p>No incidents recorded for this asset.</p>
+            <div className="ip-inset" style={{ padding: '1rem', marginBottom: '1.5rem' }}>
+              <h4 style={{ fontFamily: 'var(--ip-font-mono)', fontSize: '0.6875rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--ip-text-faint)', marginBottom: '0.75rem' }}>Details</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', fontSize: '0.875rem' }}>
+                <div>
+                  <div style={{ color: 'var(--ip-text-muted)' }}>Location</div>
+                  <div style={{ color: 'var(--ip-text)', fontWeight: 500 }}>{selectedAsset.location}</div>
                 </div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
-                  {incidents.map((inc) => (
-                    <div key={inc.id} style={{
-                      padding: 'var(--space-md)',
-                      background: 'var(--bg-tertiary)',
-                      borderRadius: 'var(--radius-md)',
-                      border: '1px solid var(--border-color)',
-                    }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-                        <div style={{ fontWeight: 600, fontSize: '0.85rem' }}>{inc.title}</div>
-                        <span className={`badge badge-${inc.severity?.toLowerCase()}`}>{inc.severity}</span>
-                      </div>
-                      <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: 4 }}>
-                        {inc.description?.substring(0, 120)}...
-                      </div>
-                      <div style={{ display: 'flex', gap: 'var(--space-sm)', marginTop: 'var(--space-sm)', fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
-                        <span><Calendar size={12} /> {inc.incident_date}</span>
-                        <span>⏱ {inc.downtime_hours}h downtime</span>
-                        <span className={`badge badge-${inc.status === 'Closed' ? 'success' : inc.status === 'Open' ? 'danger' : 'warning'}`} style={{ fontSize: '0.65rem' }}>
-                          {inc.status}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
+                <div>
+                  <div style={{ color: 'var(--ip-text-muted)' }}>Type</div>
+                  <div style={{ color: 'var(--ip-text)', fontWeight: 500 }}>{selectedAsset.type}</div>
                 </div>
-              )}
+                <div>
+                  <div style={{ color: 'var(--ip-text-muted)' }}>Manufacturer</div>
+                  <div style={{ color: 'var(--ip-text)', fontWeight: 500 }}>{selectedAsset.manufacturer || 'Unknown'}</div>
+                </div>
+                <div>
+                  <div style={{ color: 'var(--ip-text-muted)' }}>Install Date</div>
+                  <div style={{ color: 'var(--ip-text)', fontWeight: 500 }}>{selectedAsset.installation_date ? new Date(selectedAsset.installation_date).toLocaleDateString() : '—'}</div>
+                </div>
+              </div>
             </div>
+
+            <h4 style={{ fontFamily: 'var(--ip-font-display)', fontSize: '1.125rem', color: 'var(--ip-text)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Activity size={18} /> Recent Incidents
+            </h4>
+            
+            {incidents.length === 0 ? (
+              <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--ip-text-muted)', background: 'var(--ip-inset)', borderRadius: 'var(--ip-radius-sm)', border: '1px solid var(--ip-border)' }}>
+                No incidents reported for this asset.
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                {incidents.map(inc => (
+                  <div key={inc.id} className="ip-inset" style={{ padding: '1rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                      <span style={{ fontWeight: 600, color: 'var(--ip-text)', fontSize: '0.875rem' }}>{inc.title}</span>
+                      <span className={getSeverityBadge(inc.severity)}>{inc.severity}</span>
+                    </div>
+                    <div style={{ fontSize: '0.8125rem', color: 'var(--ip-text-muted)', marginBottom: 8 }}>{inc.description}</div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--ip-text-faint)', fontFamily: 'var(--ip-font-mono)' }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><Calendar size={12} /> {new Date(inc.date).toLocaleDateString()}</span>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}><AlertTriangle size={12} /> {inc.category}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>

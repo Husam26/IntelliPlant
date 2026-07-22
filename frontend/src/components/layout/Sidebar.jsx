@@ -25,18 +25,18 @@ const navigation = [
   {
     section: 'Main',
     items: [
-      { name: 'Dashboard', path: '/', icon: LayoutDashboard },
-      { name: 'AI Copilot', path: '/copilot', icon: MessageSquareText },
-      { name: 'Documents', path: '/documents', icon: FileStack },
+      { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+      { name: 'AI Copilot', path: '/dashboard/copilot', icon: MessageSquareText },
+      { name: 'Documents', path: '/dashboard/documents', icon: FileStack },
     ],
   },
   {
     section: 'Intelligence',
     items: [
-      { name: 'Digital Twin', path: '/plant-map', icon: Map },
-      { name: 'Assets', path: '/assets', icon: Cog },
-      { name: 'Compliance', path: '/compliance', icon: ShieldCheck },
-      { name: 'Insights', path: '/insights', icon: TrendingUp },
+      { name: 'Digital Twin', path: '/dashboard/plant-map', icon: Map },
+      { name: 'Assets', path: '/dashboard/assets', icon: Cog },
+      { name: 'Compliance', path: '/dashboard/compliance', icon: ShieldCheck },
+      { name: 'Insights', path: '/dashboard/insights', icon: TrendingUp },
     ],
   },
 ];
@@ -49,10 +49,12 @@ export default function Sidebar() {
         <div className="logo-icon">
           <Factory size={22} />
         </div>
-        <div>
-          <h1>IntelliPlant</h1>
-          <div className="logo-subtitle">Knowledge Intelligence</div>
+        <div className="logo-text">
+          <span className="logo-name">IntelliPlant</span>
+          <span className="logo-sub">Registry Control</span>
         </div>
+        {/* We use an invisible overlay link so the whole area is clickable and routes home */}
+        <NavLink to="/" className="sidebar-logo-link" />
       </div>
 
       {/* Navigation */}
@@ -67,7 +69,7 @@ export default function Sidebar() {
                 className={({ isActive }) =>
                   `nav-link ${isActive ? 'active' : ''}`
                 }
-                end={item.path === '/'}
+                end={item.path === '/' || item.path === '/dashboard'}
               >
                 <item.icon size={20} />
                 <span>{item.name}</span>

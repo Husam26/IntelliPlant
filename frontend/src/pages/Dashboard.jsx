@@ -53,8 +53,11 @@ export default function Dashboard() {
   }
 
   function getSeverityBadge(severity) {
-    const cls = severity?.toLowerCase() || 'low';
-    return `badge badge-${cls}`;
+    const cls = severity?.toLowerCase() || 'info';
+    if (cls === 'high' || cls === 'critical') return 'ip-badge ip-badge-danger';
+    if (cls === 'medium') return 'ip-badge ip-badge-warning';
+    if (cls === 'low') return 'ip-badge ip-badge-good';
+    return `ip-badge ip-badge-info`;
   }
 
   if (loading) {
@@ -70,11 +73,11 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="page-content">
+    <div className="page-content ip-animate-enter">
       {/* Stat Cards */}
       <div className="stats-grid">
-        <div className="stat-card stagger-1">
-          <div className="stat-icon blue"><FileStack size={24} /></div>
+        <div className="ip-panel stat-card stagger-1">
+          <div className="stat-icon blue"><FileStack size={22} /></div>
           <div className="stat-info">
             <div className="stat-label">Total Documents</div>
             <div className="stat-value">{overview?.total_documents || 0}</div>
@@ -82,8 +85,8 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="stat-card stagger-2">
-          <div className="stat-icon green"><Cog size={24} /></div>
+        <div className="ip-panel stat-card stagger-2">
+          <div className="stat-icon green"><Cog size={22} /></div>
           <div className="stat-info">
             <div className="stat-label">Assets Monitored</div>
             <div className="stat-value">{overview?.total_assets || 0}</div>
@@ -91,8 +94,8 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="stat-card stagger-3">
-          <div className="stat-icon amber"><AlertTriangle size={24} /></div>
+        <div className="ip-panel stat-card stagger-3">
+          <div className="stat-icon amber"><AlertTriangle size={22} /></div>
           <div className="stat-info">
             <div className="stat-label">Total Incidents</div>
             <div className="stat-value">{overview?.total_incidents || 0}</div>
@@ -100,8 +103,8 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="stat-card stagger-4">
-          <div className="stat-icon purple"><ShieldCheck size={24} /></div>
+        <div className="ip-panel stat-card stagger-4">
+          <div className="stat-icon purple"><ShieldCheck size={22} /></div>
           <div className="stat-info">
             <div className="stat-label">Compliance Rate</div>
             <div className="stat-value">{overview?.compliance_rate || 0}%</div>
@@ -113,16 +116,16 @@ export default function Dashboard() {
       {/* Dashboard Grid */}
       <div className="dashboard-grid">
         {/* Asset Health Overview */}
-        <div className="card">
+        <div className="ip-panel p-4">
           <div className="section-title">
             <h2><Activity size={20} style={{ marginRight: 8, verticalAlign: 'middle' }} /> Asset Health</h2>
           </div>
           <div className="asset-grid">
             {assets.map((asset) => (
-              <div key={asset.id} className="asset-card">
+              <div key={asset.id} className="ip-inset asset-card">
                 <div className="asset-card-header">
                   <span className="asset-id">{asset.id}</span>
-                  <span className={`badge badge-${asset.criticality?.toLowerCase()}`}>
+                  <span className={`ip-badge ${getSeverityBadge(asset.criticality)}`}>
                     {asset.criticality}
                   </span>
                 </div>
@@ -134,8 +137,8 @@ export default function Dashboard() {
                   />
                 </div>
                 <div className={`health-score`} style={{
-                  color: asset.health_score >= 80 ? 'var(--accent-success)' :
-                         asset.health_score >= 60 ? 'var(--accent-secondary)' : 'var(--accent-danger)'
+                  color: asset.health_score >= 80 ? 'var(--ip-accent)' :
+                         asset.health_score >= 60 ? 'var(--ip-warning)' : 'var(--ip-danger)'
                 }}>
                   {asset.health_score}%
                 </div>
@@ -145,7 +148,7 @@ export default function Dashboard() {
         </div>
 
         {/* Recent Incidents Timeline */}
-        <div className="card">
+        <div className="ip-panel p-4">
           <div className="section-title">
             <h2><Clock size={20} style={{ marginRight: 8, verticalAlign: 'middle' }} /> Recent Incidents</h2>
           </div>
@@ -160,9 +163,9 @@ export default function Dashboard() {
                   <div className="timeline-desc">{item.asset_name}</div>
                   <div className="timeline-meta">
                     <span className={getSeverityBadge(item.severity)}>{item.severity}</span>
-                    <span className="badge badge-info">{item.category}</span>
+                    <span className="ip-badge ip-badge-info">{item.category}</span>
                     {item.downtime_hours > 0 && (
-                      <span className="badge badge-warning">{item.downtime_hours}h downtime</span>
+                      <span className="ip-badge ip-badge-warning">{item.downtime_hours}h downtime</span>
                     )}
                   </div>
                 </div>
@@ -173,12 +176,12 @@ export default function Dashboard() {
       </div>
 
       {/* Risk Scores */}
-      <div className="card" style={{ marginTop: 'var(--space-lg)' }}>
+      <div className="ip-panel p-4 mt-6">
         <div className="section-title">
           <h2><Zap size={20} style={{ marginRight: 8, verticalAlign: 'middle' }} /> Risk Assessment</h2>
         </div>
         <div style={{ overflowX: 'auto' }}>
-          <table className="doc-table">
+          <table className="ip-table">
             <thead>
               <tr>
                 <th>Asset</th>
@@ -194,29 +197,29 @@ export default function Dashboard() {
               {riskScores.map((item) => (
                 <tr key={item.asset_id}>
                   <td>
-                    <span className="font-mono" style={{ color: 'var(--accent-primary)', fontWeight: 600 }}>
+                    <span className="ip-mono" style={{ color: 'var(--ip-text)', fontWeight: 600 }}>
                       {item.asset_id}
                     </span>
-                    <span style={{ marginLeft: 8, color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+                    <span style={{ marginLeft: 8, color: 'var(--ip-text-muted)', fontSize: '0.85rem' }}>
                       {item.asset_name}
                     </span>
                   </td>
-                  <td><span className={`badge badge-${item.criticality?.toLowerCase()}`}>{item.criticality}</span></td>
+                  <td><span className={getSeverityBadge(item.criticality)}>{item.criticality}</span></td>
                   <td>
-                    <span style={{
-                      color: item.health_score >= 80 ? 'var(--accent-success)' :
-                             item.health_score >= 60 ? 'var(--accent-secondary)' : 'var(--accent-danger)',
+                    <span className="ip-mono" style={{
+                      color: item.health_score >= 80 ? 'var(--ip-accent)' :
+                             item.health_score >= 60 ? 'var(--ip-warning)' : 'var(--ip-danger)',
                       fontWeight: 600
                     }}>
                       {item.health_score}%
                     </span>
                   </td>
-                  <td>{item.incident_count}</td>
-                  <td>{item.overdue_compliance}</td>
+                  <td><span className="ip-mono">{item.incident_count}</span></td>
+                  <td><span className="ip-mono">{item.overdue_compliance}</span></td>
                   <td>
-                    <span style={{ fontWeight: 700, fontFamily: 'var(--font-mono)' }}>{item.risk_score}</span>
+                    <span className="ip-mono" style={{ fontWeight: 700 }}>{item.risk_score}</span>
                   </td>
-                  <td><span className={`badge badge-${item.risk_level?.toLowerCase()}`}>{item.risk_level}</span></td>
+                  <td><span className={getSeverityBadge(item.risk_level)}>{item.risk_level}</span></td>
                 </tr>
               ))}
             </tbody>

@@ -120,13 +120,13 @@ export default function Documents() {
   function getStatusIndicator(status) {
     switch (status) {
       case 'ready':
-        return <span className="processing-indicator" style={{ color: 'var(--accent-success)' }}><CheckCircle2 size={14} /> Ready</span>;
+        return <span className="processing-indicator" style={{ color: 'var(--ip-accent)' }}><CheckCircle2 size={14} /> Ready</span>;
       case 'processing':
-        return <span className="processing-indicator" style={{ color: 'var(--accent-primary)' }}><div className="spinner" /> Processing</span>;
+        return <span className="processing-indicator" style={{ color: 'var(--ip-info)' }}><div className="spinner" /> Processing</span>;
       case 'pending':
-        return <span className="processing-indicator" style={{ color: 'var(--accent-secondary)' }}><Loader size={14} /> Pending</span>;
+        return <span className="processing-indicator" style={{ color: 'var(--ip-warning)' }}><Loader size={14} /> Pending</span>;
       case 'failed':
-        return <span className="processing-indicator" style={{ color: 'var(--accent-danger)' }}><AlertCircle size={14} /> Failed</span>;
+        return <span className="processing-indicator" style={{ color: 'var(--ip-danger)' }}><AlertCircle size={14} /> Failed</span>;
       default:
         return <span className="processing-indicator">{status}</span>;
     }
@@ -138,11 +138,13 @@ export default function Documents() {
       'SOP': 'info',
       'Incident Report': 'danger',
       'Maintenance Report': 'warning',
-      'Compliance Report': 'success',
-      'Equipment Manual': 'medium',
+      'Compliance Report': 'good',
+      'Equipment Manual': 'neutral',
     };
-    return <span className={`badge badge-${colors[category] || 'info'}`}>{category}</span>;
+    const c = colors[category] || 'info';
+    return <span className={`ip-badge ${c !== 'neutral' ? `ip-badge-${c}` : ''}`}>{category}</span>;
   }
+
 
   return (
     <div className="page-content">
@@ -204,16 +206,16 @@ export default function Documents() {
       {/* Document Table */}
       {loading ? (
         <div style={{ display: 'flex', justifyContent: 'center', padding: '48px' }}>
-          <div className="spinner spinner-lg" />
+          <div className="spinner spinner-lg" style={{ color: 'var(--ip-accent)' }} />
         </div>
       ) : documents.length === 0 ? (
-        <div className="empty-state">
-          <FileText size={64} />
-          <h3>No Documents Yet</h3>
-          <p>Upload industrial documents to get started with AI-powered analysis.</p>
+        <div className="empty-state" style={{ textAlign: 'center', padding: '4rem', color: 'var(--ip-text-muted)' }}>
+          <FileText size={48} style={{ marginBottom: '1rem', color: 'var(--ip-text-faint)' }} />
+          <h3 style={{ fontFamily: 'var(--ip-font-display)', fontSize: '1.25rem', color: 'var(--ip-text)' }}>No Documents Yet</h3>
+          <p style={{ marginTop: '0.5rem', fontSize: '0.875rem' }}>Upload industrial documents to get started with AI-powered analysis.</p>
         </div>
       ) : (
-        <table className="doc-table">
+        <table className="ip-table">
           <thead>
             <tr>
               <th>Filename</th>
@@ -228,24 +230,24 @@ export default function Documents() {
           </thead>
           <tbody>
             {documents.map((doc) => (
-              <tr key={doc.id} className="animate-fade-in">
+              <tr key={doc.id}>
                 <td>
-                  <div className="doc-filename">
+                  <div className="doc-name">
                     <FileText size={18} />
-                    <span className="truncate" style={{ maxWidth: 300 }}>{doc.filename}</span>
+                    <span style={{ maxWidth: 300, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{doc.filename}</span>
                   </div>
                 </td>
                 <td>{getCategoryBadge(doc.doc_category)}</td>
-                <td><span className="doc-size">{formatFileSize(doc.file_size)}</span></td>
-                <td>{doc.page_count || '—'}</td>
-                <td>{doc.chunk_count || '—'}</td>
+                <td><span style={{ fontFamily: 'var(--ip-font-mono)', fontSize: '0.8125rem' }}>{formatFileSize(doc.file_size)}</span></td>
+                <td style={{ fontFamily: 'var(--ip-font-mono)' }}>{doc.page_count || '—'}</td>
+                <td style={{ fontFamily: 'var(--ip-font-mono)' }}>{doc.chunk_count || '—'}</td>
                 <td>{getStatusIndicator(doc.processing_status)}</td>
-                <td style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)' }}>
+                <td style={{ fontSize: '0.8125rem', color: 'var(--ip-text-muted)' }}>
                   {doc.upload_date ? new Date(doc.upload_date).toLocaleDateString() : '—'}
                 </td>
                 <td>
                   <button
-                    className="btn btn-icon btn-danger"
+                    className="action-btn delete"
                     onClick={(e) => { e.stopPropagation(); handleDelete(doc.id, doc.filename); }}
                     title="Delete document"
                   >

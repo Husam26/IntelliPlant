@@ -30,65 +30,76 @@ export default function Insights() {
     }
   }
 
+  function getSeverityBadge(severity) {
+    const cls = severity?.toLowerCase() || 'info';
+    if (cls === 'high' || cls === 'critical') return 'ip-badge ip-badge-danger';
+    if (cls === 'medium') return 'ip-badge ip-badge-warning';
+    if (cls === 'low') return 'ip-badge ip-badge-good';
+    return `ip-badge ip-badge-info`;
+  }
+
   if (loading) {
-    return <div className="page-content"><div className="spinner spinner-lg" style={{ margin: '48px auto' }} /></div>;
+    return <div className="page-content flex-row" style={{ justifyContent: 'center' }}><div className="spinner spinner-lg" style={{ margin: '48px auto', color: 'var(--ip-accent)' }} /></div>;
   }
 
   return (
     <div className="page-content">
       {/* Patterns Section */}
-      <div className="section-title">
-        <h2><Repeat size={20} style={{ marginRight: 8, verticalAlign: 'middle' }} /> Recurring Failure Patterns</h2>
+      <div className="section-title" style={{ marginBottom: '1.5rem', borderBottom: '1px solid var(--ip-border)', paddingBottom: '0.75rem' }}>
+        <h2 style={{ fontFamily: 'var(--ip-font-display)', fontSize: '1.25rem', color: 'var(--ip-text)', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Repeat size={20} /> Recurring Failure Patterns
+        </h2>
       </div>
 
       {patterns.length === 0 ? (
-        <div className="card" style={{ marginBottom: 'var(--space-xl)' }}>
-          <div className="empty-state">
-            <TrendingUp size={48} />
-            <h3>No Patterns Detected Yet</h3>
-            <p>Upload more documents to enable pattern detection.</p>
+        <div className="ip-panel" style={{ marginBottom: '2rem' }}>
+          <div className="empty-state" style={{ textAlign: 'center', padding: '4rem', color: 'var(--ip-text-muted)' }}>
+            <TrendingUp size={48} style={{ marginBottom: '1rem', color: 'var(--ip-text-faint)' }} />
+            <h3 style={{ fontFamily: 'var(--ip-font-display)', fontSize: '1.25rem', color: 'var(--ip-text)' }}>No Patterns Detected Yet</h3>
+            <p style={{ marginTop: '0.5rem', fontSize: '0.875rem' }}>Upload more documents to enable pattern detection.</p>
           </div>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)', marginBottom: 'var(--space-xl)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
           {patterns.map((pattern, i) => (
-            <div key={i} className="card animate-fade-in" style={{ animationDelay: `${i * 0.1}s` }}>
-              <div style={{ display: 'flex', alignItems: 'start', gap: 'var(--space-md)' }}>
+            <div key={i} className="ip-panel animate-fade-in" style={{ padding: '1.5rem', animationDelay: `${i * 0.1}s` }}>
+              <div style={{ display: 'flex', alignItems: 'start', gap: '1rem' }}>
                 <div style={{
                   width: 44, height: 44,
-                  borderRadius: 'var(--radius-md)',
-                  background: 'rgba(245, 158, 11, 0.1)',
+                  borderRadius: 'var(--ip-radius-sm)',
+                  background: 'var(--ip-warning-soft)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: 'var(--accent-secondary)', flexShrink: 0
+                  color: 'var(--ip-warning)', flexShrink: 0,
+                  border: '1px solid var(--ip-warning-border)'
                 }}>
                   <AlertTriangle size={22} />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-sm)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                     <div>
-                      <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--accent-primary)', marginRight: 8 }}>
+                      <span style={{ fontFamily: 'var(--ip-font-mono)', fontWeight: 600, color: 'var(--ip-text)', marginRight: 8 }}>
                         {pattern.asset_id}
                       </span>
-                      <span style={{ fontWeight: 600 }}>{pattern.asset_name}</span>
+                      <span style={{ fontWeight: 500, color: 'var(--ip-text-muted)' }}>{pattern.asset_name}</span>
                     </div>
-                    <div style={{ display: 'flex', gap: 'var(--space-sm)' }}>
-                      <span className={`badge badge-${pattern.severity?.toLowerCase()}`}>{pattern.severity}</span>
-                      <span className="badge badge-warning">{pattern.occurrence_count}x occurrences</span>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <span className={getSeverityBadge(pattern.severity)}>{pattern.severity}</span>
+                      <span className="ip-badge ip-badge-warning">{pattern.occurrence_count}x occurrences</span>
                     </div>
                   </div>
-                  <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: 'var(--space-sm)' }}>
+                  <div style={{ fontSize: '0.875rem', color: 'var(--ip-text-muted)', marginBottom: '0.75rem' }}>
                     {pattern.description}
                   </div>
                   <div style={{
-                    display: 'flex', alignItems: 'start', gap: 'var(--space-sm)',
-                    padding: 'var(--space-md)',
-                    background: 'rgba(16, 185, 129, 0.05)',
-                    border: '1px solid rgba(16, 185, 129, 0.15)',
-                    borderRadius: 'var(--radius-md)',
+                    display: 'flex', alignItems: 'start', gap: '0.5rem',
+                    padding: '1rem',
+                    background: 'var(--ip-accent-soft)',
+                    border: '1px solid var(--ip-accent-border)',
+                    borderRadius: 'var(--ip-radius-sm)',
                   }}>
-                    <Lightbulb size={16} style={{ color: 'var(--accent-success)', flexShrink: 0, marginTop: 2 }} />
-                    <span style={{ fontSize: '0.85rem', color: 'var(--accent-success)' }}>
-                      <strong>Recommendation:</strong> {pattern.recommendation}
+                    <Lightbulb size={16} style={{ color: 'var(--ip-accent)', flexShrink: 0, marginTop: 2 }} />
+                    <span style={{ fontSize: '0.8125rem', color: 'var(--ip-accent)' }}>
+                      <strong style={{ fontWeight: 600 }}>Recommendation:</strong> {pattern.recommendation}
                     </span>
                   </div>
                 </div>
@@ -98,34 +109,44 @@ export default function Insights() {
         </div>
       )}
 
-      {/* Risk Heatmap */}
-      <div className="section-title">
-        <h2><TrendingUp size={20} style={{ marginRight: 8, verticalAlign: 'middle' }} /> Risk Heatmap</h2>
+      {/* Predictive Risk Section */}
+      <div className="section-title" style={{ marginBottom: '1.5rem', borderBottom: '1px solid var(--ip-border)', paddingBottom: '0.75rem', marginTop: '2rem' }}>
+        <h2 style={{ fontFamily: 'var(--ip-font-display)', fontSize: '1.25rem', color: 'var(--ip-text)', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <TrendingUp size={20} /> Predictive Risk Analysis
+        </h2>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 'var(--space-md)' }}>
-        {riskScores.map((item, i) => {
-          const riskColor = item.risk_score >= 80 ? 'var(--accent-danger)' :
-                           item.risk_score >= 50 ? 'var(--accent-secondary)' :
-                           item.risk_score >= 25 ? 'var(--accent-primary)' : 'var(--accent-success)';
-          return (
-            <div key={item.asset_id} className="card animate-fade-in" style={{
-              animationDelay: `${i * 0.05}s`,
-              borderColor: `${riskColor}33`,
-              textAlign: 'center',
-            }}>
-              <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--accent-primary)', fontSize: '0.9rem' }}>
-                {item.asset_id}
-              </div>
-              <div style={{ fontSize: '2.5rem', fontWeight: 800, color: riskColor, margin: 'var(--space-sm) 0' }}>
-                {item.risk_score}
-              </div>
-              <span className={`badge badge-${item.risk_level?.toLowerCase()}`}>{item.risk_level}</span>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginTop: 'var(--space-sm)' }}>
-                {item.incident_count} incidents · {item.overdue_compliance} overdue
-              </div>
-            </div>
-          );
-        })}
+
+      <div className="ip-panel p-4">
+        <table className="ip-table">
+          <thead>
+            <tr>
+              <th>Asset</th>
+              <th>Risk Score</th>
+              <th>Risk Level</th>
+              <th>Primary Risk Factor</th>
+            </tr>
+          </thead>
+          <tbody>
+            {riskScores.map((item, i) => (
+              <tr key={i}>
+                <td>
+                  <span className="ip-mono" style={{ color: 'var(--ip-text)', fontWeight: 600 }}>{item.asset_id}</span>
+                  <span style={{ marginLeft: 8, color: 'var(--ip-text-muted)', fontSize: '0.85rem' }}>{item.asset_name}</span>
+                </td>
+                <td><span className="ip-mono" style={{ fontWeight: 700 }}>{item.risk_score}</span></td>
+                <td><span className={getSeverityBadge(item.risk_level)}>{item.risk_level}</span></td>
+                <td style={{ color: 'var(--ip-text-muted)', fontSize: '0.875rem' }}>{item.primary_risk_factor || 'N/A'}</td>
+              </tr>
+            ))}
+            {riskScores.length === 0 && (
+              <tr>
+                <td colSpan={4} style={{ textAlign: 'center', color: 'var(--ip-text-muted)', padding: '2rem' }}>
+                  No risk data available.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );

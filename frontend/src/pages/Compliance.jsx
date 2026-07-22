@@ -27,52 +27,53 @@ export default function Compliance() {
 
   function getStatusIcon(status) {
     switch (status) {
-      case 'Compliant': return <CheckCircle2 size={16} style={{ color: 'var(--accent-success)' }} />;
-      case 'Non-Compliant': return <XCircle size={16} style={{ color: 'var(--accent-danger)' }} />;
-      case 'Overdue': return <AlertTriangle size={16} style={{ color: 'var(--accent-danger)' }} />;
-      case 'Due Soon': return <Clock size={16} style={{ color: 'var(--accent-secondary)' }} />;
+      case 'Compliant': return <CheckCircle2 size={16} style={{ color: 'var(--ip-accent)' }} />;
+      case 'Non-Compliant': return <XCircle size={16} style={{ color: 'var(--ip-danger)' }} />;
+      case 'Overdue': return <AlertTriangle size={16} style={{ color: 'var(--ip-danger)' }} />;
+      case 'Due Soon': return <Clock size={16} style={{ color: 'var(--ip-warning)' }} />;
       default: return null;
     }
   }
 
   function getStatusBadge(status) {
     const map = {
-      'Compliant': 'success', 'Non-Compliant': 'danger',
+      'Compliant': 'good', 'Non-Compliant': 'danger',
       'Overdue': 'danger', 'Due Soon': 'warning'
     };
-    return `badge badge-${map[status] || 'info'}`;
+    const c = map[status] || 'info';
+    return `ip-badge ip-badge-${c}`;
   }
 
   if (loading) {
-    return <div className="page-content"><div className="spinner spinner-lg" style={{ margin: '48px auto' }} /></div>;
+    return <div className="page-content flex-row" style={{ justifyContent: 'center' }}><div className="spinner spinner-lg" style={{ margin: '48px auto', color: 'var(--ip-accent)' }} /></div>;
   }
 
   return (
     <div className="page-content">
       {/* Summary Cards */}
-      <div className="stats-grid" style={{ marginBottom: 'var(--space-xl)' }}>
-        <div className="stat-card stagger-1">
+      <div className="stats-grid" style={{ marginBottom: '2rem' }}>
+        <div className="ip-panel stat-card stagger-1">
           <div className="stat-icon green"><ShieldCheck size={24} /></div>
           <div className="stat-info">
             <div className="stat-label">Compliance Rate</div>
             <div className="stat-value">{compliance?.compliance_rate || 0}%</div>
           </div>
         </div>
-        <div className="stat-card stagger-2">
+        <div className="ip-panel stat-card stagger-2">
           <div className="stat-icon blue"><CheckCircle2 size={24} /></div>
           <div className="stat-info">
             <div className="stat-label">Compliant</div>
             <div className="stat-value">{compliance?.compliant || 0}</div>
           </div>
         </div>
-        <div className="stat-card stagger-3">
+        <div className="ip-panel stat-card stagger-3">
           <div className="stat-icon red"><XCircle size={24} /></div>
           <div className="stat-info">
             <div className="stat-label">Non-Compliant</div>
             <div className="stat-value">{compliance?.non_compliant || 0}</div>
           </div>
         </div>
-        <div className="stat-card stagger-4">
+        <div className="ip-panel stat-card stagger-4">
           <div className="stat-icon amber"><AlertTriangle size={24} /></div>
           <div className="stat-info">
             <div className="stat-label">Total Checks</div>
@@ -82,12 +83,12 @@ export default function Compliance() {
       </div>
 
       {/* Compliance Table */}
-      <div className="card">
-        <h2 style={{ marginBottom: 'var(--space-lg)' }}>
-          <ShieldCheck size={20} style={{ marginRight: 8, verticalAlign: 'middle' }} />
+      <div className="ip-panel p-4">
+        <h2 style={{ marginBottom: '1.5rem', fontFamily: 'var(--ip-font-display)', fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <ShieldCheck size={20} />
           Compliance Records
         </h2>
-        <table className="doc-table">
+        <table className="ip-table">
           <thead>
             <tr>
               <th>Asset</th>
@@ -100,26 +101,26 @@ export default function Compliance() {
             </tr>
           </thead>
           <tbody>
-            {compliance?.records?.map((rec) => (
-              <tr key={rec.id}>
+            {compliance?.records?.map((record, i) => (
+              <tr key={i} className="animate-fade-in" style={{ animationDelay: `${i * 0.05}s` }}>
                 <td>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 600, color: 'var(--accent-primary)' }}>
-                    {rec.asset_id}
-                  </span>
+                  <span className="ip-mono" style={{ color: 'var(--ip-text)', fontWeight: 600 }}>{record.asset_id}</span>
                 </td>
-                <td style={{ maxWidth: 300 }}>{rec.requirement}</td>
-                <td><span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-tertiary)' }}>{rec.sop_reference}</span></td>
+                <td>{record.requirement}</td>
+                <td><span className="ip-mono" style={{ color: 'var(--ip-text-muted)' }}>{record.sop_reference}</span></td>
                 <td>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    {getStatusIcon(rec.status)}
-                    <span className={getStatusBadge(rec.status)}>{rec.status}</span>
+                    {getStatusIcon(record.status)}
+                    <span className={getStatusBadge(record.status)}>{record.status}</span>
                   </div>
                 </td>
-                <td><span className={`badge badge-${rec.risk_level?.toLowerCase()}`}>{rec.risk_level}</span></td>
-                <td style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)' }}>{rec.last_checked || '—'}</td>
-                <td style={{ fontSize: '0.8rem', color: rec.status === 'Overdue' ? 'var(--accent-danger)' : 'var(--text-tertiary)', fontWeight: rec.status === 'Overdue' ? 600 : 400 }}>
-                  {rec.next_due || '—'}
+                <td>
+                  <span className={`ip-badge ip-badge-${record.risk_level?.toLowerCase() === 'high' ? 'danger' : record.risk_level?.toLowerCase() === 'medium' ? 'warning' : 'good'}`}>
+                    {record.risk_level}
+                  </span>
                 </td>
+                <td style={{ color: 'var(--ip-text-muted)', fontSize: '0.8125rem' }}>{record.last_checked ? new Date(record.last_checked).toLocaleDateString() : '—'}</td>
+                <td style={{ color: 'var(--ip-text)', fontWeight: 500, fontSize: '0.8125rem' }}>{record.next_due ? new Date(record.next_due).toLocaleDateString() : '—'}</td>
               </tr>
             ))}
           </tbody>

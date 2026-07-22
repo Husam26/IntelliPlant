@@ -21,9 +21,15 @@ const ASSET_TYPE_ICONS = {
 };
 
 function getHealthColor(score) {
-  if (score >= 80) return '#10b981';
-  if (score >= 60) return '#f59e0b';
-  return '#ef4444';
+  if (score >= 80) return 'var(--ip-accent)';
+  if (score >= 60) return 'var(--ip-warning)';
+  return 'var(--ip-danger)';
+}
+
+function getHealthSoftColor(score) {
+  if (score >= 80) return 'var(--ip-accent-soft)';
+  if (score >= 60) return 'var(--ip-warning-soft)';
+  return 'var(--ip-danger-soft)';
 }
 
 function getHealthStatus(score) {
@@ -224,7 +230,7 @@ export default function PlantMap() {
           <span className="plant-stat-value critical">{assets.filter(a => a.health_score < 60).length}</span>
           <span className="plant-stat-label">Critical</span>
         </div>
-        <button className="add-asset-btn" onClick={() => setShowAddModal(true)}>
+        <button className="ip-btn ip-btn-primary" onClick={() => setShowAddModal(true)}>
           <Plus size={18} /> Add Asset
         </button>
       </div>
@@ -257,6 +263,7 @@ export default function PlantMap() {
         {assets.map(node => {
           const IconComp = ASSET_TYPE_ICONS[node.type] || Zap;
           const healthColor = getHealthColor(node.health_score);
+          const healthSoftColor = getHealthSoftColor(node.health_score);
           const isSelected = selectedAsset?.id === node.id;
           const isDragging = dragState?.assetId === node.id;
 
@@ -272,7 +279,7 @@ export default function PlantMap() {
               onMouseDown={(e) => handleMouseDown(e, node)}
             >
               <div className="node-pulse" style={{ borderColor: healthColor }} />
-              <div className="node-icon" style={{ background: `${healthColor}22` }}>
+              <div className="node-icon" style={{ background: healthSoftColor }}>
                 <IconComp size={22} color={healthColor} />
               </div>
               <div className="node-label">{node.id}</div>
@@ -333,7 +340,7 @@ export default function PlantMap() {
             <div className="detail-info-grid">
               <div className="detail-info-item">
                 <span className="detail-info-label">Criticality</span>
-                <span className={`badge badge-${selectedAsset.criticality?.toLowerCase()}`}>{selectedAsset.criticality}</span>
+                <span className={`ip-badge ip-badge-${selectedAsset.criticality?.toLowerCase() === 'high' || selectedAsset.criticality?.toLowerCase() === 'critical' ? 'danger' : selectedAsset.criticality?.toLowerCase() === 'medium' ? 'warning' : 'good'}`}>{selectedAsset.criticality}</span>
               </div>
               <div className="detail-info-item">
                 <span className="detail-info-label">Status</span>
@@ -474,7 +481,7 @@ export default function PlantMap() {
                   </div>
                 </div>
               )}
-              <button type="submit" className="modal-submit-btn">
+              <button type="submit" className="ip-btn ip-btn-primary" style={{ width: '100%', justifyContent: 'center' }}>
                 <Plus size={18} /> Add to Plant Map
               </button>
             </form>
